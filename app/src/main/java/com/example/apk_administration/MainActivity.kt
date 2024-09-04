@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.apk_administration.ui.theme.Apk_administrationTheme
+import com.example.apk_administration.ui.theme.login.LoginStructre
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,6 +22,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             Apk_administrationTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
+                    LoginStructre(modifier = Modifier)
                 }
             }
         }
