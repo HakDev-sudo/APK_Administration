@@ -4,12 +4,15 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.DividerDefaults.color
 import androidx.compose.material3.Icon
@@ -25,25 +28,48 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.pm.PermissionInfoCompat.Protection
 import com.example.apk_administration.R
 
 @Composable
 fun LoginStructre(modifier: Modifier){
     Column (
         modifier = Modifier
-            .background(Color(0xFFFDFDFD))
-
+            .fillMaxSize().background(Color.Transparent)
     ){
-        GeetingLogoLog(modifier)
-        GeetingInputsLog(modifier)
-        GeetingButtonsLog(modifier)
+        Box(modifier = Modifier) {
 
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 100.dp, start = 50.dp, end = 50.dp, bottom = 0.dp)
+                    .border(20.dp, Color(0xFF2196F3), RoundedCornerShape(20.dp))
+                    .padding(10.dp)
+                    .background(Color(0xFF2196F3)),
+            ) {
+                GeetingLogoLog(modifier)
+            }
+            Column(
+                modifier = Modifier
+                    .padding(start = 50.dp, end = 50.dp, top = 255.dp )
+                    .border(4.dp, Color(0xFF2196F3), RoundedCornerShape(20.dp)),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                GeetingInputsLog(modifier)
+                GeetingBuntosnEnter(modifier = Modifier)
+                GeetingButtonsLog(modifier)
+            }
+        }
     }
 }
 
@@ -52,14 +78,14 @@ fun GeetingLogoLog(modifier: Modifier){
     Column (
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 80.dp),
+            .fillMaxSize(0.2.toFloat()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
 
 
 
     ){
-        Image(painter = painterResource(id = R.drawable.logo), contentDescription ="", modifier = Modifier.size(100.dp) )
+        Image(painter = painterResource(id = R.drawable.logo), contentDescription ="", modifier = Modifier.size(170.dp) )
     }
 
 }
@@ -78,7 +104,7 @@ fun GeetingInputsLog(modifier: Modifier){
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 50.dp),
+            .padding(top = 24.dp, start = 20.dp, end = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -103,12 +129,12 @@ fun GeetingBuntosnEnter(modifier: Modifier){
     Column(modifier = Modifier){
         OutlinedButton(onClick = {}, modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 54.dp, end = 54.dp)) {
+            .padding(top = 20.dp, start = 20.dp, end = 20.dp)) {
             Text(text = "Entrar")
         }
         OutlinedButton(onClick = {}, modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 54.dp, end = 54.dp)){
+            .padding(start = 20.dp, end = 20.dp)){
             Text(text = "Registrarse")
 
         }
@@ -118,15 +144,14 @@ fun GeetingBuntosnEnter(modifier: Modifier){
 @Composable
 fun GeetingButtonsLog(modifier : Modifier){
     Column (
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ){
         OutlinedButton(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 54.dp, end = 54.dp),
+                .padding(top = 20.dp, start = 20.dp, end = 20.dp),
             onClick = {  },
             enabled = true,
             // add background color
@@ -144,7 +169,7 @@ fun GeetingButtonsLog(modifier : Modifier){
         OutlinedButton(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 56.dp, end = 54.dp),
+                .padding(top = 8.dp, start = 20.dp, end = 20.dp, bottom = 20.dp),
             onClick = {}
         ){
             Icon(painter = painterResource(id = R.drawable.facebook), contentDescription ="Facebook Logo" , tint = Color.Unspecified)
