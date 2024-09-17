@@ -11,10 +11,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.apk_administration.ui.theme.home.HomeScreen
 
 
 @Composable
-fun CustomScaffold() {
+fun CustomScaffold(
+    navController: NavHostController= rememberNavController(),)
+{
     Scaffold(
         // Barra superior
         topBar = { CustomTopBar() },
@@ -27,7 +32,7 @@ fun CustomScaffold() {
 
         // Contenido principal
         content = { padding ->
-            CustomContent(padding)
+            NavigationHost(navController = navController, padding = padding)
         }
     )
 }
@@ -46,21 +51,7 @@ fun CustomFAB() {
     }
 }
 
-@Composable
-fun CustomContent(padding: PaddingValues) {
-    Column(
-        // Modificadores de estilo de la columna
-        modifier = Modifier
-            // Ocupar todo el espacio disponible
-            .fillMaxSize()
-            .padding(padding),
 
-        // Contenido de la aplicación
-        content = {
-            Text(text = "My app content")
-        }
-    )
-}
 
 @Preview(showBackground = true)
 @Composable
