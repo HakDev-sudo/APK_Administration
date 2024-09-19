@@ -29,7 +29,7 @@ fun RegisterStructre(modifier: Modifier){
 
     }
 }
-
+// candelero
 
 @Composable
 fun GeetingInputsRegis(modifier: Modifier){
