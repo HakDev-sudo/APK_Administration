@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.apk_administration.R
 
 
 // Acá escribiras tu
@@ -38,16 +39,21 @@ fun HomeScreen(padding: PaddingValues) {
             .fillMaxSize()
             .padding(padding)
     ) {
+
+        // Carrusel de categorías (llamando al nuevo componente)
+        val categories = listOf(
+            Category("Filtros", R.drawable.filtros_1),
+            Category("Aceite", R.drawable.filtros_1),
+            Category("Motores", R.drawable.filtros_1),
+            Category("Respuestos", R.drawable.filtros_1)
+        )
+        CategoryCarousel(categories = categories)
         // Panel de estado
         StatusCard(title = "Inventario actual", value = "1200 items", icon = Icons.Filled.Inventory)
         StatusCard(title = "Pendiente de entrada", value = "300 items", icon = Icons.Filled.Input)
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Tareas pendientes
-        TaskList(tasks = listOf("Escanear 10 productos", "Actualizar inventario"))
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         // Botones de acción rápida
         QuickActionButtons()
@@ -74,23 +80,7 @@ fun StatusCard(title: String, value: String, icon: ImageVector) {
     }
 }
 
-@Composable
-fun QuickActionButtons() {
-    Row(
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        modifier = Modifier.fillMaxWidth().padding(16.dp)
-    ) {
-        FloatingActionButton(onClick = { /* Acceso al escaneo */ }) {
-            Icon(imageVector = Icons.Filled.QrCodeScanner, contentDescription = "Escanear")
-        }
-        FloatingActionButton(onClick = { /* Añadir nuevo producto */ }) {
-            Icon(imageVector = Icons.Filled.Add, contentDescription = "Añadir producto")
-        }
-        FloatingActionButton(onClick = { /* Revisión de inventario */ }) {
-            Icon(imageVector = Icons.Filled.Inventory, contentDescription = "Inventario")
-        }
-    }
-}
+
 
 @Composable
 fun TaskList(tasks: List<String>) {
