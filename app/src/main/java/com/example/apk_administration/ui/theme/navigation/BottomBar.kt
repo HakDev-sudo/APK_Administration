@@ -1,63 +1,86 @@
 package com.example.apk_administration.ui.theme.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Build
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.rounded.Home
-import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.material.icons.filled.Inventory
-import androidx.compose.material.icons.filled.Dashboard
-import com.google.androidgamesdk.gametextinput.Settings
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+
+@Composable
+fun BottomBarItem(
+    icon: @Composable () -> Unit,
+    label: String,
+    onClick: () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(8.dp)
+    ) {
+        IconButton(onClick = onClick, modifier = Modifier.size(48.dp)) {
+            icon()
+        }
+        Text(
+            text = label,
+            fontSize = 12.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 4.dp)
+        )
+    }
+}
 
 @Composable
 fun CustomBottomBar() {
-    BottomAppBar {
-        IconButton(
-            onClick = { print("Build") },
-            modifier = Modifier.weight(1f)
+    Surface(
+        tonalElevation = 8.dp,
+        shadowElevation = 8.dp,
+        color = MaterialTheme.colorScheme.surface
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(Icons.Filled.Inventory, contentDescription = "Build description")
-        }
-        IconButton(
-            onClick = { print("Menu") },
-            modifier = Modifier.weight(1f)
-        ) {
-            Icon(
-                Icons.Filled.Dashboard,
-                contentDescription = "Menu description",
+            BottomBarItem(
+                icon = { Icon(Icons.Filled.Menu, contentDescription = "Menu") },
+                label = "Menu",
+                onClick = { /* TODO: Implementar acción */ }
+            )
+            BottomBarItem(
+                icon = { Icon(Icons.Filled.Nfc, contentDescription = "NFC") },
+                label = "NFC",
+                onClick = { /* TODO: Implementar acción */ }
+            )
+            BottomBarItem(
+                icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
+                label = "Home",
+                onClick = { /* TODO: Implementar acción */ }
+            )
+            BottomBarItem(
+                icon = { Icon(Icons.Filled.Settings, contentDescription = "Configuración") },
+                label = "Config",
+                onClick = { /* TODO: Implementar acción */ }
+            )
+            BottomBarItem(
+                icon = { Icon(Icons.Filled.Person, contentDescription = "Perfil") },
+                label = "Perfil",
+                onClick = { /* TODO: Implementar acción */ }
             )
         }
-        IconButton(
-            onClick = { print("Build") },
-            modifier = Modifier.weight(1f)
-        ) {
-            Icon(Icons.Filled.Home, contentDescription = "Build description")
-        }
-        IconButton(
-            onClick = { print("Favorite") },
-            modifier = Modifier.weight(1f)) {
-            Icon(
-                Icons.Filled.Notifications,
-                contentDescription = "Favorite description",
-            )
-        }
-        IconButton(
-            onClick = { print("Delete") },
-            modifier = Modifier.weight(1f)
-        ) {
-            Icon(
-                Icons.Filled.Settings,
-                contentDescription = "Delete description",
-            )
-        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewCustomBottomBar() {
+    MaterialTheme {
+        CustomBottomBar()
     }
 }
