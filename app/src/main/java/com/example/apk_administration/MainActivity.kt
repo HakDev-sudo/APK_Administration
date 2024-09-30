@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.apk_administration.ui.theme.Apk_administrationTheme
 import com.example.apk_administration.ui.theme.account.RegisterStructre
 import com.example.apk_administration.ui.theme.login.LoginStructre
+import com.example.apk_administration.ui.theme.navigation.MainScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
