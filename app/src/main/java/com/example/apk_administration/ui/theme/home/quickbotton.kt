@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.navigation.NavController
 
 @Composable
 fun ActionButton(
@@ -42,7 +43,7 @@ fun ActionButton(
 }
 
 @Composable
-fun QuickActionButtons() {
+fun QuickActionButtons(navController: NavController) {
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier
@@ -86,15 +87,8 @@ fun QuickActionButtons() {
                 )
             },
             label = "Administrar Productos",
-            onClick = { /* TODO: Implementar acción */ }
+            onClick = { navController.navigate("admProducts")  }
         )
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewQuickActionButtons() {
-    MaterialTheme {
-        QuickActionButtons()
-    }
-}

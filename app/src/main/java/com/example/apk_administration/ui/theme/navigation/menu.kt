@@ -17,6 +17,15 @@ import com.example.apk_administration.ui.theme.home.HomeScreen
 
 
 @Composable
+fun MainScreen() {
+    // Recuerda el controlador de navegación
+    val navController = rememberNavController()
+
+    // Llama al CustomScaffold pasándole el controlador de navegación
+    CustomScaffold(navController = navController)
+}
+
+@Composable
 fun CustomScaffold(
     navController: NavHostController= rememberNavController(),)
 {
@@ -25,7 +34,7 @@ fun CustomScaffold(
         topBar = { CustomTopBar() },
 
         // Barra inferior
-        bottomBar = { CustomBottomBar() },
+        bottomBar = { CustomBottomBar(navController) },
 
         // Botón flotante personalizado
         floatingActionButton = { CustomFAB() },

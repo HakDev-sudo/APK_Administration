@@ -28,12 +28,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.apk_administration.R
 
 
 // Acá escribiras tu
 @Composable
-fun HomeScreen(padding: PaddingValues) {
+fun HomeScreen(padding: PaddingValues, navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -56,7 +58,7 @@ fun HomeScreen(padding: PaddingValues) {
 
 
         // Botones de acción rápida
-        QuickActionButtons()
+        QuickActionButtons(navController = navController)
     }
 }
 
@@ -94,5 +96,6 @@ fun TaskList(tasks: List<String>) {
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen(padding = PaddingValues(0.dp))
+    val navController = rememberNavController()  // Crear NavController
+    HomeScreen(padding = PaddingValues(0.dp), navController = navController)
 }

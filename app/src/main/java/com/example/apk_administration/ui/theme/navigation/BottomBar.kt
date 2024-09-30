@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.navigation.NavHostController
 
 @Composable
 fun BottomBarItem(
@@ -35,7 +36,7 @@ fun BottomBarItem(
 }
 
 @Composable
-fun CustomBottomBar() {
+fun CustomBottomBar(navController: NavHostController) {
     Surface(
         tonalElevation = 8.dp,
         shadowElevation = 8.dp,
@@ -56,12 +57,12 @@ fun CustomBottomBar() {
             BottomBarItem(
                 icon = { Icon(Icons.Filled.Nfc, contentDescription = "NFC") },
                 label = "NFC",
-                onClick = { /* TODO: Implementar acción */ }
+                onClick = { navController.navigate("nfc") }
             )
             BottomBarItem(
                 icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
                 label = "Home",
-                onClick = { /* TODO: Implementar acción */ }
+                onClick = { navController.navigate("home") }
             )
             BottomBarItem(
                 icon = { Icon(Icons.Filled.Settings, contentDescription = "Configuración") },
@@ -77,10 +78,4 @@ fun CustomBottomBar() {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewCustomBottomBar() {
-    MaterialTheme {
-        CustomBottomBar()
-    }
-}
+
