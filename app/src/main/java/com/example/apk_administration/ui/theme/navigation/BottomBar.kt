@@ -36,7 +36,7 @@ fun BottomBarItem(
 }
 
 @Composable
-fun CustomBottomBar(navController: NavHostController) {
+fun CustomBottomBar(navController: NavHostController,onMenuClick: () -> Unit) {
     Surface(
         tonalElevation = 8.dp,
         shadowElevation = 8.dp,
@@ -52,7 +52,7 @@ fun CustomBottomBar(navController: NavHostController) {
             BottomBarItem(
                 icon = { Icon(Icons.Filled.Menu, contentDescription = "Menu") },
                 label = "Menu",
-                onClick = { /* TODO: Implementar acción */ }
+                onClick = onMenuClick
             )
             BottomBarItem(
                 icon = { Icon(Icons.Filled.Nfc, contentDescription = "NFC") },
