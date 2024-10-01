@@ -10,6 +10,7 @@ import com.example.apk_administration.ui.theme.home.HomeScreen
 import com.example.apk_administration.ui.theme.login.LoginStructre
 import com.example.apk_administration.ui.theme.products.Product
 import com.example.apk_administration.ui.theme.products.ProductManagementScreen
+import com.example.apk_administration.ui.theme.settings.SettingsScreenContent
 
 @Composable
 fun NavigationHost(navController: NavHostController, padding: PaddingValues) {
@@ -29,5 +30,8 @@ fun NavigationHost(navController: NavHostController, padding: PaddingValues) {
             Product(name = "Producto B", quantity = 5, price = 25.0),
             Product(name = "Producto C", quantity = 12, price = 10.0)
         ),padding)}
+        composable("setting") {
+            SettingsScreenContent(padding)
+        }
     }
 }
