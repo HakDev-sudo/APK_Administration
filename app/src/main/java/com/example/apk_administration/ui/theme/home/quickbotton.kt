@@ -74,7 +74,7 @@ fun QuickActionButtons(navController: NavController) {
                 )
             },
             label = "Administrar Roles",
-            onClick = { /* TODO: Implementar acción */ }
+            onClick = { navController.navigate("admUsers") }
         )
         ActionButton(
             icon = {

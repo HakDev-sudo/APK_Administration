@@ -1,5 +1,6 @@
 package com.example.apk_administration.ui.theme.navigation
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,7 +25,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun MainScreen() {
-    // Recuerda el controlador de navegación
+    // Controlador de navegación
     val navController = rememberNavController()
 
     // Llama al CustomScaffold pasándole el controlador de navegación
@@ -33,10 +34,11 @@ fun MainScreen() {
 
 @Composable
 fun CustomScaffold(
-    navController: NavHostController= rememberNavController(),)
-{
+    navController: NavHostController = rememberNavController()
+) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -44,18 +46,14 @@ fun CustomScaffold(
         }
     ) {
         Scaffold(
-            // Barra superior
             topBar = { CustomTopBar() },
-
-            // Barra inferior
-            bottomBar = { CustomBottomBar(navController,{ scope.launch { drawerState.open() } }) },
-
-            // Botón flotante personalizado
+            bottomBar = { CustomBottomBar(navController) { scope.launch { drawerState.open() } } },
             floatingActionButton = { CustomFAB() },
-
-            // Contenido principal
+            // Aquí aseguramos que el contenido principal se ajuste correctamente
             content = { padding ->
-                NavigationHost(navController = navController, padding = padding)
+                Box(modifier = Modifier.padding(padding)) {
+                    NavigationHost(navController = navController, padding = PaddingValues(0.dp))
+                }
             }
         )
     }
