@@ -61,7 +61,7 @@ fun QuickActionButtons(navController: NavController) {
                 )
             },
             label = "Visualizar Registro",
-            onClick = { /* TODO: Implementar acción */ }
+            onClick = { navController.navigate("registros") }
         )
         ActionButton(
             icon = {

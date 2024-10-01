@@ -10,6 +10,7 @@ import com.example.apk_administration.ui.theme.home.HomeScreen
 import com.example.apk_administration.ui.theme.login.LoginStructre
 import com.example.apk_administration.ui.theme.products.Product
 import com.example.apk_administration.ui.theme.products.ProductManagementScreen
+import com.example.apk_administration.ui.theme.registros.RegistroScreen
 import com.example.apk_administration.ui.theme.settings.SettingsScreenContent
 import com.example.apk_administration.ui.theme.user.PerfilScreen
 
@@ -37,5 +38,6 @@ fun NavigationHost(navController: NavHostController, padding: PaddingValues) {
         composable("perfil") {
             PerfilScreen(padding)
         }
+        composable("registros"){RegistroScreen(padding)}
     }
 }
