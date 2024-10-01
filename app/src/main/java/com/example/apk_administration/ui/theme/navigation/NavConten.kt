@@ -11,6 +11,7 @@ import com.example.apk_administration.ui.theme.login.LoginStructre
 import com.example.apk_administration.ui.theme.products.Product
 import com.example.apk_administration.ui.theme.products.ProductManagementScreen
 import com.example.apk_administration.ui.theme.settings.SettingsScreenContent
+import com.example.apk_administration.ui.theme.user.PerfilScreen
 
 @Composable
 fun NavigationHost(navController: NavHostController, padding: PaddingValues) {
@@ -32,6 +33,9 @@ fun NavigationHost(navController: NavHostController, padding: PaddingValues) {
         ),padding)}
         composable("setting") {
             SettingsScreenContent(padding)
+        }
+        composable("perfil") {
+            PerfilScreen(padding)
         }
     }
 }

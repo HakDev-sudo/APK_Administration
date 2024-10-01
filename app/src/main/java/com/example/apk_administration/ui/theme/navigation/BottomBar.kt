@@ -72,7 +72,7 @@ fun CustomBottomBar(navController: NavHostController) {
             BottomBarItem(
                 icon = { Icon(Icons.Filled.Person, contentDescription = "Perfil") },
                 label = "Perfil",
-                onClick = { /* TODO: Implementar acción */ }
+                onClick = { navController.navigate("perfil") }
             )
         }
     }
