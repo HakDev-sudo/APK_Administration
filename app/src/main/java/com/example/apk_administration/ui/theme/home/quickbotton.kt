@@ -63,19 +63,7 @@ fun QuickActionButtons(navController: NavController) {
             label = "Visualizar Registro",
             onClick = { navController.navigate("registros") }
         )
-        ActionButton(
-            icon = {
-                Icon(
-                    imageVector = Icons.Filled.AdminPanelSettings,
-                    contentDescription = "Administrar roles",
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(24.dp)
-                )
-            },
-            label = "Administrar Roles",
-            onClick = { navController.navigate("admUsers") }
-        )
+
         ActionButton(
             icon = {
                 Icon(

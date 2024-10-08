@@ -31,16 +31,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.pm.PermissionInfoCompat.Protection
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.apk_administration.R
 
 @Composable
-fun LoginStructre(modifier: Modifier){
+fun LoginStructre(navController: NavHostController,modifier: Modifier=Modifier){
     Column (
         modifier = Modifier
             .fillMaxSize().background(Color.Transparent)
@@ -66,7 +69,7 @@ fun LoginStructre(modifier: Modifier){
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 GeetingInputsLog(modifier)
-                GeetingBuntosnEnter(modifier = Modifier)
+                GeetingBuntosnEnter(modifier = Modifier, navController = navController)
                 GeetingButtonsLog(modifier)
             }
         }
@@ -124,15 +127,16 @@ fun GeetingInputsLog(modifier: Modifier){
 
 
 @Composable
-fun GeetingBuntosnEnter(modifier: Modifier){
+fun GeetingBuntosnEnter(modifier: Modifier, navController: NavHostController){
 
     Column(modifier = Modifier){
-        OutlinedButton(onClick = {}, modifier = Modifier
+        OutlinedButton(onClick = {},
+            modifier = Modifier
             .fillMaxWidth()
             .padding(top = 20.dp, start = 20.dp, end = 20.dp)) {
             Text(text = "Entrar")
         }
-        OutlinedButton(onClick = {}, modifier = Modifier
+        OutlinedButton(onClick = {navController.navigate("basic_info")}, modifier = Modifier
             .fillMaxWidth()
             .padding(start = 20.dp, end = 20.dp)){
             Text(text = "Registrarse")
@@ -189,5 +193,5 @@ fun recoveriCount(modifier: Modifier){
 @Preview(showBackground = true)
 @Composable
 fun previewsTotal(){
-    LoginStructre(modifier = Modifier)
+    LoginStructre(navController = NavHostController(LocalContext.current),modifier = Modifier)
 }

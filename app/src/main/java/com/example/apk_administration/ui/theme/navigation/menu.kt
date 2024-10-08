@@ -12,6 +12,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -19,17 +20,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.apk_administration.ui.theme.account.AuthNavHost
 import com.example.apk_administration.ui.theme.home.HomeScreen
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun MainScreen() {
-    // Controlador de navegación
-    val navController = rememberNavController()
+    // Estado de autenticación (puedes usar lógica real para verificar si el usuario está autenticado)
+    val isLoggedIn = remember { false } // Esto se actualizará a 'true' si el usuario ha iniciado sesión.
 
-    // Llama al CustomScaffold pasándole el controlador de navegación
-    CustomScaffold(navController = navController)
+    // Si el usuario está autenticado, muestra la navegación principal. Si no, muestra la navegación de login/registro.
+    if (isLoggedIn) {
+        // Controlador de navegación principal
+        val navController = rememberNavController()
+        // Navegación principal (pantalla de home, etc.)
+        NavigationHost(navController = navController, padding = PaddingValues(0.dp))
+    } else {
+        // Navegación para autenticación (login/registro)
+        AuthNavHost()
+    }
 }
 
 @Composable

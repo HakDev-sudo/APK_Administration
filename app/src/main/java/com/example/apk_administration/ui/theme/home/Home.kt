@@ -50,15 +50,14 @@ fun HomeScreen(padding: PaddingValues, navController: NavController) {
             Category("Respuestos", R.drawable.filtros_1)
         )
         CategoryCarousel(categories = categories)
+        Spacer(modifier = Modifier.height(16.dp))
+        // Botones de acción rápida
+        QuickActionButtons(navController = navController)
+        Spacer(modifier = Modifier.height(16.dp))
         // Panel de estado
         StatusCard(title = "Inventario actual", value = "1200 items", icon = Icons.Filled.Inventory)
         StatusCard(title = "Pendiente de entrada", value = "300 items", icon = Icons.Filled.Input)
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-
-        // Botones de acción rápida
-        QuickActionButtons(navController = navController)
     }
 }
 
