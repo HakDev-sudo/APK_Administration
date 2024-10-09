@@ -43,14 +43,13 @@ import androidx.navigation.NavHostController
 import com.example.apk_administration.R
 
 @Composable
-fun LoginStructre(navController: NavHostController,modifier: Modifier=Modifier){
-    Column (
+fun LoginStructre(navController: NavHostController, modifier: Modifier = Modifier) {
+    Column(
         modifier = Modifier
-            .fillMaxSize().background(Color.Transparent)
-    ){
+            .fillMaxSize()
+            .background(Color.Transparent)
+    ) {
         Box(modifier = Modifier) {
-
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -63,18 +62,22 @@ fun LoginStructre(navController: NavHostController,modifier: Modifier=Modifier){
             }
             Column(
                 modifier = Modifier
-                    .padding(start = 50.dp, end = 50.dp, top = 255.dp )
+                    .padding(start = 50.dp, end = 50.dp, top = 255.dp)
                     .border(4.dp, Color(0xFF2196F3), RoundedCornerShape(20.dp)),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 GeetingInputsLog(modifier)
-                GeetingBuntosnEnter(modifier = Modifier, navController = navController)
+                GeetingBuntosnEnter(
+                    modifier = Modifier,
+                    navController = navController
+                )
                 GeetingButtonsLog(modifier)
             }
         }
     }
 }
+
 
 @Composable
 fun GeetingLogoLog(modifier: Modifier){
@@ -127,20 +130,23 @@ fun GeetingInputsLog(modifier: Modifier){
 
 
 @Composable
-fun GeetingBuntosnEnter(modifier: Modifier, navController: NavHostController){
-
-    Column(modifier = Modifier){
-        OutlinedButton(onClick = {},
+fun GeetingBuntosnEnter(modifier: Modifier, navController: NavHostController) {
+    Column(modifier = Modifier) {
+        OutlinedButton(
+            onClick = { navController.navigate("home") }, // Navegar a CustomScaffold
             modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 20.dp, start = 20.dp, end = 20.dp)) {
+                .fillMaxWidth()
+                .padding(top = 20.dp, start = 20.dp, end = 20.dp)
+        ) {
             Text(text = "Entrar")
         }
-        OutlinedButton(onClick = {navController.navigate("basic_info")}, modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 20.dp, end = 20.dp)){
+        OutlinedButton(
+            onClick = { navController.navigate("basic_info") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp, end = 20.dp)
+        ) {
             Text(text = "Registrarse")
-
         }
     }
 }
