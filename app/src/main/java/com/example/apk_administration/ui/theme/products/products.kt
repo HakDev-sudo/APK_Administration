@@ -14,20 +14,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 
 // Barra superior con botones de agregar y filtro
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProductManagementTopBar() {
+fun ProductManagementTopBar(navController: NavHostController) {
     TopAppBar(
         title = { Text("Administrar Productos", fontSize = 20.sp, fontWeight = FontWeight.Bold) },
         actions = {
-            IconButton(onClick = { /* Acción para agregar producto */ }) {
+            IconButton(onClick = { navController.navigate("product_form") }) {
                 Icon(Icons.Default.Add, contentDescription = "Agregar Producto")
             }
             IconButton(onClick = { /* Acción para filtrar productos */ }) {
@@ -80,12 +83,12 @@ fun ProductList(products: List<Product>) {
 
 // Pantalla completa de administración de productos
 @Composable
-fun ProductManagementScreen(products: List<Product>,padding: PaddingValues) {
+fun ProductManagementScreen(products: List<Product>,padding: PaddingValues, navController: NavHostController) {
     Column(
         modifier = Modifier.fillMaxSize().padding(padding)
     ) {
         // Barra superior
-        ProductManagementTopBar()
+        ProductManagementTopBar(navController = navController)
 
         // Lista de productos
         ProductList(products = products)
@@ -103,5 +106,5 @@ fun PreviewProductManagementScreen() {
         Product(name = "Producto B", quantity = 5, price = 25.0),
         Product(name = "Producto C", quantity = 12, price = 10.0)
     )
-    ProductManagementScreen(products = sampleProducts,padding = PaddingValues(0.dp))
+    ProductManagementScreen(products = sampleProducts,padding = PaddingValues(0.dp), navController = NavHostController(LocalContext.current))
 }

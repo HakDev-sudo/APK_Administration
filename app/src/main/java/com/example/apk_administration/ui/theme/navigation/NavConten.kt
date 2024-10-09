@@ -11,6 +11,7 @@ import com.example.apk_administration.ui.theme.administraruser.UserManagementScr
 import com.example.apk_administration.ui.theme.home.HomeScreen
 import com.example.apk_administration.ui.theme.login.LoginStructre
 import com.example.apk_administration.ui.theme.products.Product
+import com.example.apk_administration.ui.theme.products.ProductForm
 import com.example.apk_administration.ui.theme.products.ProductManagementScreen
 import com.example.apk_administration.ui.theme.registros.RegistroScreen
 import com.example.apk_administration.ui.theme.settings.SettingsScreenContent
@@ -27,13 +28,13 @@ fun NavigationHost(navController: NavHostController, padding: PaddingValues) {
 
         }
         composable("nfc") {
-            NFCWindow(padding)
+            NFCWindow(padding, navController = navController)
         }
         composable("admProducts"){ProductManagementScreen(products = listOf(
             Product(name = "Producto A", quantity = 10, price = 15.0),
             Product(name = "Producto B", quantity = 5, price = 25.0),
             Product(name = "Producto C", quantity = 12, price = 10.0)
-        ),padding)}
+        ),padding, navController= navController)}
         composable("setting") {
             SettingsScreenContent(padding)
         }
@@ -49,6 +50,14 @@ fun NavigationHost(navController: NavHostController, padding: PaddingValues) {
                 ),
                 padding = padding
             )
+        }
+
+        // Pantalla del formulario de producto
+        composable("product_form") {
+            ProductForm { id, name, img, price, description, idTag, idCategory ->
+                // Aquí iría la lógica para guardar el producto
+                // Puedes hacer un `navController.popBackStack()` si deseas volver atrás después de guardar
+            }
         }
     }
 }
