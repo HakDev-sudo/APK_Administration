@@ -32,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -40,96 +41,49 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileImageScreen(
-    onNextClick: (Uri?) -> Unit,
-    navController: NavHostController
+fun ProfileImageSelector(
+    imageUri: Uri?,
+    onImageSelected: (Uri?) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    var currentImageUri by remember { mutableStateOf(imageUri) }
 
     // Lanzador para seleccionar imágenes
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        imageUri = uri // Almacena la URI de la imagen seleccionada
+        currentImageUri = uri
+        onImageSelected(uri) // Actualiza la imagen seleccionada
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Imagen de Perfil") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) { // Navegar hacia atrás
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Atrás")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF63A7E1))
+    Column(
+        modifier = modifier
+    ) {
+        Text("Imagen de Perfil", style = MaterialTheme.typography.headlineSmall)
+
+        // Imagen de perfil circular
+        currentImageUri?.let {
+            AsyncImage(
+                model = it,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(CircleShape)
+                    .border(2.dp, Color.Gray, CircleShape)
             )
         }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Botón para seleccionar imagen
+        Button(
+            onClick = { launcher.launch("image/*") },
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Imagen de Perfil", style = MaterialTheme.typography.headlineMedium)
-
-            imageUri?.let {
-                AsyncImage(
-                    model = it,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clip(CircleShape)
-                        .border(2.dp, Color.Gray, CircleShape)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = {
-                    // Abre el selector de imágenes
-                    launcher.launch("image/*")
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Seleccionar Imagen")
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Botones "Cancelar" y "Siguiente" en la misma fila
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Button(
-                    onClick = {
-                        // Navegar a la pantalla de login
-                        navController.navigate("login") {
-                            popUpTo(navController.graph.startDestinationId) {
-                                inclusive = true
-                            }
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(Color.Red)
-                ) {
-                    Text("Cancelar")
-                }
-
-                Button(
-                    onClick = { onNextClick(imageUri)
-                    navController.navigate("password_screen") },
-                    colors = ButtonDefaults.buttonColors(Color(0xFF63A7E1))
-                ) {
-                    Text("Siguiente")
-                }
-            }
+            Text("Seleccionar Imagen")
         }
     }
 }
+
 
 
 

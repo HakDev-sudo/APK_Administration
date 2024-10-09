@@ -2,6 +2,7 @@ package com.example.apk_administration.ui.theme.account
 
 import android.app.DatePickerDialog
 import android.icu.util.Calendar
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -39,6 +40,8 @@ import com.example.apk_administration.ui.theme.login.GeetingLogoLog
 
 import androidx.compose.material.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
@@ -46,6 +49,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.*
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 
 import java.util.*
@@ -53,7 +57,7 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BasicInfoScreen(
-    onNextClick: (String, String, String, String, String) -> Unit,
+    onNextClick: (String, String, String, String, String, Uri?, String) -> Unit, // Incluye la contraseña
     navController: NavHostController,
     modifier: Modifier = Modifier,
     padding: PaddingValues
@@ -63,6 +67,10 @@ fun BasicInfoScreen(
     var year by remember { mutableStateOf("") } // Campo para ingresar la fecha manualmente
     var email by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
+    var profileImageUri by remember { mutableStateOf<Uri?>(null) } // Imagen de perfil
+    var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    val isPasswordMatch = password == confirmPassword // Verifica si las contraseñas coinciden
 
     Scaffold(
         topBar = {
@@ -81,36 +89,36 @@ fun BasicInfoScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .verticalScroll(rememberScrollState()) // Habilita el desplazamiento vertical
                 .padding(horizontal = 24.dp),
             verticalArrangement = Arrangement.Center
         ) {
+            // Logo o saludo en la parte superior
             GeetingLogoLog(modifier)
             Spacer(modifier = Modifier.height(16.dp))
-            Text("Información Personal", style = MaterialTheme.typography.headlineMedium)
 
+            // Sección de información personal
+            Text("Información Personal", style = MaterialTheme.typography.headlineMedium)
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
                 label = { Text("Nombre") },
                 modifier = Modifier.fillMaxWidth()
             )
-
             OutlinedTextField(
                 value = lastname,
                 onValueChange = { lastname = it },
                 label = { Text("Apellido") },
                 modifier = Modifier.fillMaxWidth()
             )
-
-            // Campo para ingresar la fecha manualmente
             OutlinedTextField(
                 value = year,
                 onValueChange = { year = it },
                 label = { Text("Fecha de Nacimiento (DD/MM/AAAA)") },
                 modifier = Modifier.fillMaxWidth()
             )
-
             Spacer(modifier = Modifier.height(16.dp))
+
             // Sección de información de contacto
             ContactInfoContent(
                 email = email,
@@ -121,7 +129,36 @@ fun BasicInfoScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Botones "Cancelar" y "Siguiente" en la misma fila
+            // Componente de selección de imagen de perfil
+            ProfileImageSelector(
+                imageUri = profileImageUri,
+                onImageSelected = { profileImageUri = it }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Sección de Contraseña
+            Text("Contraseña", style = MaterialTheme.typography.headlineSmall)
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Contraseña") },
+                modifier = Modifier.fillMaxWidth(),
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password)
+            )
+            OutlinedTextField(
+                value = confirmPassword,
+                onValueChange = { confirmPassword = it },
+                label = { Text("Confirmar Contraseña") },
+                modifier = Modifier.fillMaxWidth(),
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Botones "Cancelar" y "Registrar"
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -134,20 +171,22 @@ fun BasicInfoScreen(
                 }
 
                 Button(
-                    onClick = { onNextClick(name, lastname, year, email, phone)
-                        navController.navigate("profile_image")
-                        {
-                            popUpTo("profile_image") { inclusive = true } // Limpia la pantalla anterior
+                    onClick = {
+                        if (isPasswordMatch) {
+                            onNextClick(name, lastname, year, email, phone, profileImageUri, password)
                         }
                     },
+                    enabled = isPasswordMatch,
                     colors = ButtonDefaults.buttonColors(Color(0xFF63A7E1))
                 ) {
-                    Text("Siguiente")
+                    Text("Registrar")
                 }
             }
         }
     }
 }
+
+
 
 
 
