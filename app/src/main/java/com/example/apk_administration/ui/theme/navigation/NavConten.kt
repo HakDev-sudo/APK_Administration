@@ -3,22 +3,33 @@ package com.example.apk_administration.ui.theme.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import com.example.apk_administration.ui.theme.Category.CategoryApiService
 import com.example.apk_administration.ui.theme.NFC.NFCWindow
+import com.example.apk_administration.ui.theme.NFC.NfcApiService
 import com.example.apk_administration.ui.theme.administraruser.User
 import com.example.apk_administration.ui.theme.administraruser.UserManagementScreen
 import com.example.apk_administration.ui.theme.home.HomeScreen
 import com.example.apk_administration.ui.theme.login.LoginStructre
-import com.example.apk_administration.ui.theme.products.Product
+import com.example.apk_administration.ui.theme.products.ContenidoProductoEliminar
 import com.example.apk_administration.ui.theme.products.ProductForm
 import com.example.apk_administration.ui.theme.products.ProductManagementScreen
+import com.example.apk_administration.ui.theme.products.ProductoApiServiceC
 import com.example.apk_administration.ui.theme.registros.RegistroScreen
 import com.example.apk_administration.ui.theme.settings.SettingsScreenContent
 import com.example.apk_administration.ui.theme.user.PerfilScreen
 
 @Composable
-fun NavigationHost(navController: NavHostController, padding: PaddingValues) {
+fun NavigationHost(
+    navController: NavHostController,
+    padding: PaddingValues,
+    nfcApiService: NfcApiService,
+    categoryApiService: CategoryApiService,
+    productoApiServiceC: ProductoApiServiceC
+) {
     NavHost(navController = navController, startDestination = "home") {
         // Pantalla de login
 
@@ -30,11 +41,7 @@ fun NavigationHost(navController: NavHostController, padding: PaddingValues) {
         composable("nfc") {
             NFCWindow(padding, navController = navController)
         }
-        composable("admProducts"){ProductManagementScreen(products = listOf(
-            Product(name = "Producto A", quantity = 10, price = 15.0),
-            Product(name = "Producto B", quantity = 5, price = 25.0),
-            Product(name = "Producto C", quantity = 12, price = 10.0)
-        ),padding, navController= navController)}
+
         composable("setting") {
             SettingsScreenContent(padding)
         }
@@ -52,12 +59,19 @@ fun NavigationHost(navController: NavHostController, padding: PaddingValues) {
             )
         }
 
-        // Pantalla del formulario de producto
-        composable("product_form") {
-            ProductForm { id, name, img, price, description, idTag, idCategory ->
-                // Aquí iría la lógica para guardar el producto
-                // Puedes hacer un `navController.popBackStack()` si deseas volver atrás después de guardar
-            }
+        // Pantallas de productos
+        composable("admProducts"){ProductManagementScreen(navController=navController, servicio=productoApiServiceC)}
+        composable("product_form") { ProductForm(navController=navController,servicio= productoApiServiceC,0) }
+        composable("productoEditar/{id}", arguments = listOf(
+            navArgument("id") { type = NavType.IntType })
+        ) {
+            ProductForm(navController, productoApiServiceC, it.arguments!!.getInt("id"))
         }
+        composable("productoDel/{id}", arguments = listOf(
+            navArgument("id") { type = NavType.IntType })
+        ) {
+            ContenidoProductoEliminar(navController, productoApiServiceC, it.arguments!!.getInt("id"))
+        }
+
     }
 }

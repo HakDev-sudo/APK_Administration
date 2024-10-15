@@ -72,4 +72,11 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation ("androidx.compose.material:material-icons-core:1.3.1")
     implementation ("androidx.compose.material:material-icons-extended:1.3.1")
+    implementation("io.coil-kt:coil-compose:2.7.0")
+    //nuevas dependencias
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+
 }
