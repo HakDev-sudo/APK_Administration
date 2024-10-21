@@ -29,13 +29,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.apk_administration.R
 
 
 // Acá escribiras tu
 @Composable
-fun HomeScreen(padding: PaddingValues, navController: NavController) {
+fun HomeScreen(padding: PaddingValues, navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -49,7 +50,7 @@ fun HomeScreen(padding: PaddingValues, navController: NavController) {
             Category("Motores", R.drawable.filtros_1),
             Category("Respuestos", R.drawable.filtros_1)
         )
-        CategoryCarousel(categories = categories)
+        CategoryCarousel(categories = categories, navController = navController)
         Spacer(modifier = Modifier.height(16.dp))
         // Botones de acción rápida
         QuickActionButtons(navController = navController)
@@ -83,14 +84,7 @@ fun StatusCard(title: String, value: String, icon: ImageVector) {
 
 
 
-@Composable
-fun TaskList(tasks: List<String>) {
-    LazyColumn(modifier = Modifier.padding(16.dp)) {
-        items(tasks) { task ->
-            Text(text = task, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(8.dp))
-        }
-    }
-}
+
 
 @Preview(showBackground = true)
 @Composable

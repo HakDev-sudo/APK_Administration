@@ -1,6 +1,7 @@
 package com.example.apk_administration.ui.theme.home
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -18,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavHostController
 import com.example.apk_administration.R
 
 data class Category(val name: String, val imageResId: Int)
@@ -54,13 +57,18 @@ fun CategoryItem(category: Category) {
 }
 
 @Composable
-fun CategoryCarousel(categories: List<Category>) {
+fun CategoryCarousel(categories: List<Category>, navController: NavHostController) {
     Column {
         Text(
             text = "Categorías",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.
+                        padding(16.dp).
+                        clickable {
+                        // Navegar a la pantalla de lista de categorías
+                        navController.navigate("categoryList")
+                        }
         )
         LazyRow {
             items(categories) { category ->
@@ -88,7 +96,7 @@ fun PreviewFullScreen() {
             )
 
             // Llamar a tu componente con los datos de prueba
-            CategoryCarousel(categories = categories)
+            CategoryCarousel(categories = categories, navController = NavHostController(LocalContext.current))
         }
     }
 }

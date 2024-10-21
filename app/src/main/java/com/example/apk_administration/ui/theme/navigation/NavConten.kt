@@ -8,6 +8,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.apk_administration.ui.theme.Category.CategoryApiService
+import com.example.apk_administration.ui.theme.Category.CategoryListScreen
+import com.example.apk_administration.ui.theme.Category.ContenidoCategoryEditar
+import com.example.apk_administration.ui.theme.Category.ContenidoCategoryEliminar
 import com.example.apk_administration.ui.theme.NFC.NFCWindow
 import com.example.apk_administration.ui.theme.NFC.NfcApiService
 import com.example.apk_administration.ui.theme.administraruser.User
@@ -71,6 +74,24 @@ fun NavigationHost(
             navArgument("id") { type = NavType.IntType })
         ) {
             ContenidoProductoEliminar(navController, productoApiServiceC, it.arguments!!.getInt("id"))
+        }
+
+        //Pantallas de categorias
+        composable("categoryList") {
+            CategoryListScreen(navController, categoryApiService)
+        }
+        composable("categoriaNueva") {
+            ContenidoCategoryEditar(navController, categoryApiService, 0)
+        }
+        composable("categoriaEditar/{id}", arguments = listOf(
+            navArgument("id") { type = NavType.IntType })
+        ) {
+            ContenidoCategoryEditar(navController, categoryApiService, it.arguments!!.getInt("id"))
+        }
+        composable("categoriaDel/{id}", arguments = listOf(
+            navArgument("id") { type = NavType.IntType })
+        ) {
+            ContenidoCategoryEliminar(navController, categoryApiService, it.arguments!!.getInt("id"))
         }
 
     }
