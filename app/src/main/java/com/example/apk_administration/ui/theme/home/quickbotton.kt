@@ -21,7 +21,7 @@ fun ActionButton(
 ) {
     Surface(
         modifier = Modifier
-            .size(width = 110.dp, height = 110.dp)
+            .size(width = 150.dp, height = 150.dp)
             .padding(4.dp),
         onClick = onClick,
         color = MaterialTheme.colorScheme.surfaceVariant,
@@ -32,11 +32,11 @@ fun ActionButton(
             icon()
             Text(
                 text = label,
-                fontSize = 12.sp,
+                fontSize = 14.sp,
                 textAlign = TextAlign.End,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(4.dp)
+                    .padding(8.dp)
             )
         }
     }
@@ -57,7 +57,7 @@ fun QuickActionButtons(navController: NavController) {
                     contentDescription = "Visualizar registro",
                     modifier = Modifier
                         .padding(8.dp)
-                        .size(24.dp)
+                        .size(32.dp)
                 )
             },
             label = "Visualizar Registro",
@@ -71,7 +71,7 @@ fun QuickActionButtons(navController: NavController) {
                     contentDescription = "Administrar productos",
                     modifier = Modifier
                         .padding(8.dp)
-                        .size(24.dp)
+                        .size(32.dp)
                 )
             },
             label = "Administrar Productos",
