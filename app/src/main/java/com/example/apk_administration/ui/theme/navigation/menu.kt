@@ -1,19 +1,29 @@
 package com.example.apk_administration.ui.theme.navigation
 
+import android.app.Activity
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,7 +43,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 @Composable
 fun AlmacenApp() {
     // Configuración de Retrofit y creación de servicios API
-    val urlBase = "http://10.0.2.2:8000/" // o tu IP si usarás un dispositivo externo
+    val urlBase = "http://192.168.18.33:8000/" // o tu IP si usarás un dispositivo externo
     val retrofit = Retrofit.Builder().baseUrl(urlBase)
         .addConverterFactory(GsonConverterFactory.create()).build()
 
@@ -68,25 +78,36 @@ fun CustomScaffold(
         drawerState = drawerState,
         drawerContent = {
             DrawerContent(navController)
-        }
+        },
+        modifier = Modifier.background(MaterialTheme.colorScheme.background)
     ) {
-        Scaffold(
-            topBar = { CustomTopBar() },
-            bottomBar = { CustomBottomBar(navController) { scope.launch { drawerState.open() } } },
-            floatingActionButton = { CustomFAB() },
-            // Aquí aseguramos que el contenido principal se ajuste correctamente
-            content = { padding ->
-                Box(modifier = Modifier.padding(padding)) {
-                    NavigationHost(
-                        navController = navController,
-                        padding = PaddingValues(0.dp),
-                        nfcApiService = nfcApiService,
-                        categoryApiService = categoryApiService,
-                        productoApiServiceC = productoApiServiceC
-                    )
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .windowInsetsPadding(WindowInsets.systemBars) // Aquí respetamos las barras del sistema
+        ) {
+            Scaffold(
+
+                topBar = { CustomTopBar() },
+                bottomBar = { CustomBottomBar(navController) { scope.launch { drawerState.open() } } },
+                floatingActionButton = { CustomFAB() },
+                // Aquí aseguramos que el contenido principal se ajuste correctamente
+                content = { padding ->
+                    Box(
+                        modifier = Modifier.fillMaxSize()
+                            .background(MaterialTheme.colorScheme.background).padding(padding)
+                    ) {
+                        NavigationHost(
+                            navController = navController,
+                            padding = PaddingValues(0.dp),
+                            nfcApiService = nfcApiService,
+                            categoryApiService = categoryApiService,
+                            productoApiServiceC = productoApiServiceC,
+                            activity = navController.context as Activity
+                        )
+                    }
                 }
-            }
-        )
+            )
+        }
     }
 }
 
@@ -98,8 +119,8 @@ fun CustomFAB() {
         // Acción al hacer clic en el botón (sin definir)
         onClick = { /*TODO*/ }) {
         Text(
-            fontSize = 24.sp, // Tamaño de fuente del texto del botón
-            text = "+" // Texto del botón
+            fontSize = 12.sp, // Tamaño de fuente del texto del botón
+            text = "Añadir Registro" // Texto del botón
         )
     }
 }

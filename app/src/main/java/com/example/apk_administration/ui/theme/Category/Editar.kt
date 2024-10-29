@@ -96,8 +96,8 @@ fun ContenidoCategoryEditar(
 
             if (response.isSuccessful) {
                 // Redirigir a la pantalla de categorías después de guardar
-                navController.navigate("categorias") {
-                    popUpTo("categorias") { inclusive = true }
+                navController.navigate("categoryList") {
+                    popUpTo("categoryList") { inclusive = true }
                 }
             } else {
                 // Aquí puedes manejar el error

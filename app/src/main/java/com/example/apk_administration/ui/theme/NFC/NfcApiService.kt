@@ -10,19 +10,19 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface NfcApiService {
-    @GET("nfc")
+    @GET("nfc/")
     suspend fun selectNfcs(): List<NfcModel>
 
-    @GET("nfc/{id}")
+    @GET("nfc/{id}/")
     suspend fun selectNfc(@Path("id") id: String): Response<NfcModel>
 
     @Headers("Content-Type: application/json")
-    @POST("nfc")
+    @POST("nfc/")
     suspend fun insertNfc(@Body nfc: NfcModel): Response<NfcModel>
 
-    @PUT("nfc/{id}")
+    @PUT("nfc/{id}/")
     suspend fun updateNfc(@Path("id") id: String, @Body nfc: NfcModel): Response<NfcModel>
 
-    @DELETE("nfc/{id}")
+    @DELETE("nfc/{id}/")
     suspend fun deleteNfc(@Path("id") id: String): Response<NfcModel>
 }

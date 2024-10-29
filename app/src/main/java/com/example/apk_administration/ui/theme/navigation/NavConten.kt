@@ -1,5 +1,6 @@
 package com.example.apk_administration.ui.theme.navigation
 
+import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.navigation.NavHostController
@@ -11,6 +12,7 @@ import com.example.apk_administration.ui.theme.Category.CategoryApiService
 import com.example.apk_administration.ui.theme.Category.CategoryListScreen
 import com.example.apk_administration.ui.theme.Category.ContenidoCategoryEditar
 import com.example.apk_administration.ui.theme.Category.ContenidoCategoryEliminar
+import com.example.apk_administration.ui.theme.NFC.NFCReaderScreen
 import com.example.apk_administration.ui.theme.NFC.NFCWindow
 import com.example.apk_administration.ui.theme.NFC.NfcApiService
 import com.example.apk_administration.ui.theme.administraruser.User
@@ -31,7 +33,8 @@ fun NavigationHost(
     padding: PaddingValues,
     nfcApiService: NfcApiService,
     categoryApiService: CategoryApiService,
-    productoApiServiceC: ProductoApiServiceC
+    productoApiServiceC: ProductoApiServiceC,
+    activity: Activity
 ) {
     NavHost(navController = navController, startDestination = "home") {
         // Pantalla de login
@@ -93,6 +96,9 @@ fun NavigationHost(
         ) {
             ContenidoCategoryEliminar(navController, categoryApiService, it.arguments!!.getInt("id"))
         }
+
+        //Pantallas NFC
+        composable("nfc_reader") { NFCReaderScreen(activity, nfcApiService) }
 
     }
 }
