@@ -69,4 +69,14 @@ class NFCManager(private val activity: Activity, val apiService: NfcApiService) 
         }
         return sb.toString()
     }
+
+    // Nueva función para obtener todas las etiquetas NFC y verificar si existe el id_tag
+    suspend fun checkIfNFCExists(idTag: String): Boolean {
+        return try {
+            val nfcList = apiService.selectNfcs() // Llama a la API para obtener todas las etiquetas
+            nfcList.any { it.id_tag == idTag } // Verifica si el id_tag ya existe
+        } catch (e: Exception) {
+            false // Retorna falso si ocurre un error
+        }
+    }
 }

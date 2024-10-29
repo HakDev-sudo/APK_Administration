@@ -66,8 +66,9 @@ fun NFCReaderScreen(
     var showLoadingDialog by remember { mutableStateOf(false) }
     var showConfirmationDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
-
+    var snackbarHostState = remember { SnackbarHostState() }
     val fechaDeHoy: LocalDate = LocalDate.now()
+
     // Función para sincronizar NFC de forma asincrónica
     fun synchronizeNFC() {
         showLoadingDialog = true
@@ -84,6 +85,24 @@ fun NFCReaderScreen(
         }
     }
 
+    // Función para verificar y registrar el NFC
+    fun checkAndRegisterNFC() {
+        coroutineScope.launch {
+
+            val exists = nfcManager.checkIfNFCExists(nfcId ?: "") // Verificar si el id_tag ya existe
+
+            if (exists) {
+                // Mostrar Snackbar si la tarjeta ya está registrada
+                snackbarHostState.showSnackbar("Tarjeta ya registrada")
+                showConfirmationDialog = false
+
+            } else {
+                // Mostrar Dialog para confirmar el registro si no existe
+                showConfirmationDialog = true
+            }
+        }
+    }
+
     // Función para registrar el NFC
     fun registerNFC() {
         coroutineScope.launch {
@@ -94,6 +113,7 @@ fun NFCReaderScreen(
             if (response.isSuccessful) {
                 showConfirmationDialog = false
                 onClearNFCId()
+                snackbarHostState.showSnackbar("Tarjeta registrada con éxito")
                 // Manejar respuesta exitosa, mostrar mensaje, etc.
             } else {
                 // Manejar error
@@ -108,6 +128,7 @@ fun NFCReaderScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        SnackbarHost(hostState = snackbarHostState)
         if (!isNFCEnabled) {
             Text(
                 text = "NFC no está habilitado",
@@ -184,7 +205,7 @@ fun NFCReaderScreen(
             }
         }
         if (nfcId != null) {
-            showConfirmationDialog = true // Muestra el cuadro de diálogo al leer una etiqueta
+            checkAndRegisterNFC() // Activar verificación solo si hay un nfcId válido
         }
     }
 
@@ -203,7 +224,7 @@ fun NFCReaderScreen(
         }
     }
 
-    if (showConfirmationDialog && nfcId != null) {
+    if (showConfirmationDialog && nfcId != null  ) {
         ConfirmationDialog(
             nfcId = nfcId,
             onConfirm = {
