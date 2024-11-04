@@ -21,7 +21,7 @@ fun BottomBarItem(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier.padding(4.dp)
     ) {
         IconButton(onClick = onClick, modifier = Modifier.size(48.dp)) {
             icon()
@@ -45,7 +45,7 @@ fun CustomBottomBar(navController: NavHostController,onMenuClick: () -> Unit) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(4.dp),
+                .padding(2.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {

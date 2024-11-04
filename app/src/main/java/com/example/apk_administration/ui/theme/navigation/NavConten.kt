@@ -18,6 +18,7 @@ import com.example.apk_administration.ui.theme.NFC.NFCManager
 import com.example.apk_administration.ui.theme.NFC.NFCReaderScreen
 import com.example.apk_administration.ui.theme.NFC.NFCWindow
 import com.example.apk_administration.ui.theme.NFC.NfcApiService
+import com.example.apk_administration.ui.theme.NFC.ProductNFCReader
 import com.example.apk_administration.ui.theme.NFC.ProductNFCReaderScreen
 import com.example.apk_administration.ui.theme.administraruser.User
 import com.example.apk_administration.ui.theme.administraruser.UserManagementScreen
@@ -26,6 +27,7 @@ import com.example.apk_administration.ui.theme.login.LoginStructre
 import com.example.apk_administration.ui.theme.products.ContenidoProductoEliminar
 import com.example.apk_administration.ui.theme.products.ProductForm
 import com.example.apk_administration.ui.theme.products.ProductManagementScreen
+import com.example.apk_administration.ui.theme.products.ProductViewModel
 import com.example.apk_administration.ui.theme.products.ProductoApiServiceC
 import com.example.apk_administration.ui.theme.registros.RegistroScreen
 import com.example.apk_administration.ui.theme.settings.SettingsScreenContent
@@ -39,7 +41,8 @@ fun NavigationHost(
     nfcApiService: NfcApiService,
     categoryApiService: CategoryApiService,
     productoApiServiceC: ProductoApiServiceC,
-    activity: Activity
+    activity: Activity,
+    productViewModel: ProductViewModel
 ) {
     NavHost(navController = navController, startDestination = "home") {
         // Pantalla de login
@@ -105,7 +108,7 @@ fun NavigationHost(
         //Pantallas NFC
         composable("nfc_reader") { NFCReaderScreen(activity, nfcApiService ) }
         composable("nfc_producto") {
-            ProductNFCReaderScreen()
+            ProductNFCReader(activity, productViewModel, nfcApiService)
         }
     }
 }

@@ -1,6 +1,8 @@
 package com.example.apk_administration.ui.theme.navigation
 
 import android.app.Activity
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,15 +33,18 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.apk_administration.ui.theme.Category.CategoryApiService
+import com.example.apk_administration.ui.theme.NFC.NFCManager
 import com.example.apk_administration.ui.theme.NFC.NfcApiService
 import com.example.apk_administration.ui.theme.account.AuthNavHost
 import com.example.apk_administration.ui.theme.home.HomeScreen
+import com.example.apk_administration.ui.theme.products.ProductViewModel
 import com.example.apk_administration.ui.theme.products.ProductoApiServiceC
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AlmacenApp() {
     // Configuración de Retrofit y creación de servicios API
@@ -51,7 +56,7 @@ fun AlmacenApp() {
     val nfcApiService = retrofit.create(NfcApiService::class.java)
     val categoryApiService = retrofit.create(CategoryApiService::class.java)
     val productoApiServiceC = retrofit.create(ProductoApiServiceC::class.java)
-
+    val productViewModel = ProductViewModel(productoApiServiceC)
     // Inicializar el NavController
     val navController = rememberNavController()
 
@@ -60,16 +65,20 @@ fun AlmacenApp() {
         navController = navController,
         nfcApiService = nfcApiService,
         categoryApiService = categoryApiService,
-        productoApiServiceC = productoApiServiceC
+        productoApiServiceC = productoApiServiceC,
+        productViewModel = productViewModel
+
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CustomScaffold(
     navController: NavHostController = rememberNavController(),
     nfcApiService: NfcApiService,
     categoryApiService: CategoryApiService,
-    productoApiServiceC: ProductoApiServiceC
+    productoApiServiceC: ProductoApiServiceC,
+    productViewModel: ProductViewModel
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -102,7 +111,9 @@ fun CustomScaffold(
                             nfcApiService = nfcApiService,
                             categoryApiService = categoryApiService,
                             productoApiServiceC = productoApiServiceC,
-                            activity = navController.context as Activity
+                            activity = navController.context as Activity,
+                            productViewModel = productViewModel
+
                         )
                     }
                 }
