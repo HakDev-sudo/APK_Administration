@@ -26,4 +26,8 @@ class ProductViewModel(private val apiService: ProductoApiServiceC) : ViewModel(
             }
         }
     }
+
+    fun refreshProducts() {
+        loadProducts() // Vuelve a cargar los productos desde la API
+    }
 }
