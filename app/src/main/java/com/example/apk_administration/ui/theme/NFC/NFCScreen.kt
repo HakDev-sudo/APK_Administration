@@ -84,7 +84,7 @@ fun NFCWindow(padding: PaddingValues, navController: NavHostController) {
             ) {
                 // Botón de "Registro de Entrada"
                 Button(
-                    onClick = { /* Acción de registrar entrada */ },
+                    onClick = { navController.navigate("nfc_producto") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 32.dp, vertical = 8.dp)

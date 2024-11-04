@@ -1,6 +1,8 @@
 package com.example.apk_administration.ui.theme.navigation
 
 import android.app.Activity
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.navigation.NavHostController
@@ -12,9 +14,11 @@ import com.example.apk_administration.ui.theme.Category.CategoryApiService
 import com.example.apk_administration.ui.theme.Category.CategoryListScreen
 import com.example.apk_administration.ui.theme.Category.ContenidoCategoryEditar
 import com.example.apk_administration.ui.theme.Category.ContenidoCategoryEliminar
+import com.example.apk_administration.ui.theme.NFC.NFCManager
 import com.example.apk_administration.ui.theme.NFC.NFCReaderScreen
 import com.example.apk_administration.ui.theme.NFC.NFCWindow
 import com.example.apk_administration.ui.theme.NFC.NfcApiService
+import com.example.apk_administration.ui.theme.NFC.ProductNFCReaderScreen
 import com.example.apk_administration.ui.theme.administraruser.User
 import com.example.apk_administration.ui.theme.administraruser.UserManagementScreen
 import com.example.apk_administration.ui.theme.home.HomeScreen
@@ -27,6 +31,7 @@ import com.example.apk_administration.ui.theme.registros.RegistroScreen
 import com.example.apk_administration.ui.theme.settings.SettingsScreenContent
 import com.example.apk_administration.ui.theme.user.PerfilScreen
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NavigationHost(
     navController: NavHostController,
@@ -98,7 +103,9 @@ fun NavigationHost(
         }
 
         //Pantallas NFC
-        composable("nfc_reader") { NFCReaderScreen(activity, nfcApiService) }
-
+        composable("nfc_reader") { NFCReaderScreen(activity, nfcApiService ) }
+        composable("nfc_producto") {
+            ProductNFCReaderScreen()
+        }
     }
 }
