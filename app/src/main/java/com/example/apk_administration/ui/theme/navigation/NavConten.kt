@@ -29,6 +29,7 @@ import com.example.apk_administration.ui.theme.products.ProductForm
 import com.example.apk_administration.ui.theme.products.ProductManagementScreen
 import com.example.apk_administration.ui.theme.products.ProductViewModel
 import com.example.apk_administration.ui.theme.products.ProductoApiServiceC
+import com.example.apk_administration.ui.theme.products.ProductoDetailScreen
 import com.example.apk_administration.ui.theme.registros.RegistroScreen
 import com.example.apk_administration.ui.theme.settings.SettingsScreenContent
 import com.example.apk_administration.ui.theme.user.PerfilScreen
@@ -85,6 +86,11 @@ fun NavigationHost(
             navArgument("id") { type = NavType.IntType })
         ) {
             ContenidoProductoEliminar(navController, productoApiServiceC, it.arguments!!.getInt("id"))
+        }
+        composable("productoVer/{id}", arguments = listOf(
+            navArgument("id") { type = NavType.StringType })
+        ) {
+            ProductoDetailScreen(it.arguments!!.getString("id")!!, navController, productoApiServiceC)
         }
 
         //Pantallas de categorias

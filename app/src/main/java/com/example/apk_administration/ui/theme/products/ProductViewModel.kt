@@ -26,6 +26,10 @@ class ProductViewModel(private val apiService: ProductoApiServiceC) : ViewModel(
             }
         }
     }
+    // Método para contar los productos actuales
+    fun getProductCount(): Int {
+        return _productList.value.size
+    }
 
     fun refreshProducts() {
         loadProducts() // Vuelve a cargar los productos desde la API

@@ -4,12 +4,17 @@ import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -26,6 +31,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -85,6 +91,9 @@ fun ProductNFCReaderScreen(
     val scannedProducts = remember { mutableStateListOf<ProductoModelGet>() }
     val snackbarHostState = remember { SnackbarHostState() }
 
+    // Estado para el monto total de los productos escaneados
+    var totalAmount by remember { mutableStateOf(0.0) }
+
     // Lógica para activar y desactivar el modo de lector NFC
     LaunchedEffect(isReaderActive) {
         if (isReaderActive) {
@@ -101,6 +110,8 @@ fun ProductNFCReaderScreen(
             if (matchedProduct != null && !scannedProducts.contains(matchedProduct)) {
                 // Agrega el producto encontrado a la lista de productos escaneados
                 scannedProducts.add(matchedProduct!!)
+                // Actualiza el monto total
+                totalAmount += matchedProduct!!.price
             } else if (matchedProduct == null) {
                 snackbarHostState.showSnackbar("No se encontró ningún producto vinculado")
             }
@@ -145,20 +156,43 @@ fun ProductNFCReaderScreen(
 
         // Mostrar la lista de productos escaneados
         Text("Productos Escaneados:", style = MaterialTheme.typography.labelMedium)
+
         LazyColumn {
             items(scannedProducts) { product ->
-                Column(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp)
                         .background(MaterialTheme.colorScheme.surface)
-                        .padding(8.dp)
+                        .padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("Nombre: ${product.name}")
-                    Text("Precio: ${product.price}")
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("Nombre: ${product.name}")
+                        Text("Precio: ${product.price}")
+                    }
+                    // Icono de basura para eliminar el producto
+                    IconButton(onClick = {
+                        scannedProducts.remove(product)
+                        totalAmount -= product.price // Actualiza el monto total al eliminar
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Eliminar producto",
+                            tint = Color.Red
+                        )
+                    }
                 }
             }
         }
+
+        // Mostrar el monto total
+        Text(
+            text = "Monto total: $${"%.2f".format(totalAmount)}",
+            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier.padding(top = 16.dp)
+        )
     }
 }
 
