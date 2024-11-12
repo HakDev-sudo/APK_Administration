@@ -106,7 +106,7 @@ fun ProductNFCReaderScreen(
     // Efecto para actualizar `matchedProduct` y agregar a `scannedProducts` cada vez que cambia `nfcId`
     LaunchedEffect(nfcId) {
         nfcId?.let { idTag ->
-            matchedProduct = productList.find { it.idNFC?.id_tag == idTag }
+            //matchedProduct = productList.find { it.idNFC?.id_tag == idTag }
             if (matchedProduct != null && !scannedProducts.contains(matchedProduct)) {
                 // Agrega el producto encontrado a la lista de productos escaneados
                 scannedProducts.add(matchedProduct!!)

@@ -6,9 +6,11 @@ data class NfcModel (
     @SerializedName("id")
     var id: Int,
     @SerializedName("id_tag")
-    var id_tag: String,
+    var idTag: String,
     @SerializedName("status")
     var status: String,
     @SerializedName("fecha_asignado")
-    var fecha_asignado: String
+    private var fechaAsignado: String,
+    @SerializedName("product")
+    var product: Int? // Representa el ID del producto asociado, puede ser null si no está asignado
 )

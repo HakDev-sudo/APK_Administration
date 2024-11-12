@@ -10,19 +10,19 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface NfcApiService {
-    @GET("nfc/")
+    @GET("api/nfc") // Ajusta la ruta para obtener todos los NFC
     suspend fun selectNfcs(): List<NfcModel>
 
-    @GET("nfc/{id}/")
-    suspend fun selectNfc(@Path("id") id: String): Response<NfcModel>
+    @GET("api/nfc/{id}") // Ajusta la ruta para obtener un NFC por ID
+    suspend fun selectNfc(@Path("id") id: Int): Response<NfcModel>
 
     @Headers("Content-Type: application/json")
-    @POST("nfc/")
+    @POST("api/nfc") // Ajusta la ruta para crear un nuevo NFC
     suspend fun insertNfc(@Body nfc: NfcModel): Response<NfcModel>
 
-    @PUT("nfc/{id}/")
-    suspend fun updateNfc(@Path("id") id: String, @Body nfc: NfcModel): Response<NfcModel>
+    @PUT("api/nfc/{id}") // Ajusta la ruta para actualizar un NFC
+    suspend fun updateNfc(@Path("id") id: Int, @Body nfc: NfcModel): Response<NfcModel>
 
-    @DELETE("nfc/{id}/")
-    suspend fun deleteNfc(@Path("id") id: String): Response<NfcModel>
+    @DELETE("api/nfc/{id}") // Ajusta la ruta para eliminar un NFC
+    suspend fun deleteNfc(@Path("id") id: Int): Response<NfcModel>
 }

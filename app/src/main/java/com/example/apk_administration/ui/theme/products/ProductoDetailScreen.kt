@@ -62,9 +62,7 @@ fun ProductoDetailScreen(productId: String, navController: NavController, servic
                 Text(text = "Categoría: ${producto.category.name}", fontSize = 16.sp)
                 Text(text = "Stock: ${producto.stock}", fontSize = 16.sp)
 
-                producto.idNFC?.let {
-                    Text(text = "NFC Tag: ${it.id_tag}", fontSize = 16.sp)
-                }
+
 
                 Button(
                     onClick = { navController.navigateUp() },

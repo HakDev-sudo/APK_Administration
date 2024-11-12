@@ -128,7 +128,7 @@ fun ProductManagementScreen(servicio: ProductoApiService, navController: NavHost
 
         // Cargar categorías y NFCs
         categorias = servicio.selectCategories().associate { it.id to it.name }
-        nfcs = servicio.selectnfcs().associate { it.id to it.id_tag }
+
     }
 
     Column(

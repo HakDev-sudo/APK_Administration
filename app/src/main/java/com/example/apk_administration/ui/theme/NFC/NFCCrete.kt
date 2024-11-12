@@ -106,20 +106,28 @@ fun NFCReaderScreen(
     // Función para registrar el NFC
     fun registerNFC() {
         coroutineScope.launch {
-            // Crea el modelo NFC con los datos leídos
-            val newNfc = NfcModel(id = 0, id_tag = nfcId ?: "", status = "Sin Asignar", fecha_asignado = "$fechaDeHoy")
+            // Crea el modelo NFC con los datos leídos; aquí product es null inicialmente porque no está asignado
+            val newNfc = NfcModel(
+                id = 0,
+                idTag = nfcId ?: "", // Asegúrate de que coincida con el nombre correcto
+                status = "Sin Asignar",
+                fechaAsignado = "$fechaDeHoy",
+                product = null // Se pasa null o el ID del producto si lo tienes
+            )
+
+            // Llama al servicio API para insertar el nuevo NFC
             val response = nfcManager.apiService.insertNfc(newNfc)
 
             if (response.isSuccessful) {
                 showConfirmationDialog = false
                 onClearNFCId()
                 snackbarHostState.showSnackbar("Tarjeta registrada con éxito")
-                // Manejar respuesta exitosa, mostrar mensaje, etc.
             } else {
-                // Manejar error
+                snackbarHostState.showSnackbar("Error al registrar la tarjeta")
             }
         }
     }
+
 
     Column(
         modifier = Modifier
