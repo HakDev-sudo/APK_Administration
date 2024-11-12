@@ -74,7 +74,7 @@ fun CategoryListScreen(navController: NavHostController, servicio: CategoryApiSe
                             navController.navigate("categoriaVer/${categoria.id}")
                         },
                     shape = RoundedCornerShape(8.dp),
-                    colors = CardDefaults.cardColors(Color(0xFF87CEEB)) // Diferente color para categorías
+                    colors = CardDefaults.cardColors(Color(0xFF8F85EE)) // Diferente color para categorías
                 ) {
                     Row(
                         modifier = Modifier

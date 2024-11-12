@@ -24,10 +24,13 @@ import com.example.apk_administration.ui.theme.administraruser.User
 import com.example.apk_administration.ui.theme.administraruser.UserManagementScreen
 import com.example.apk_administration.ui.theme.home.HomeScreen
 import com.example.apk_administration.ui.theme.login.LoginStructre
+import com.example.apk_administration.ui.theme.products.AddOrEditProductScreen
 import com.example.apk_administration.ui.theme.products.ContenidoProductoEliminar
 import com.example.apk_administration.ui.theme.products.ProductForm
 import com.example.apk_administration.ui.theme.products.ProductManagementScreen
+import com.example.apk_administration.ui.theme.products.ProductModel
 import com.example.apk_administration.ui.theme.products.ProductViewModel
+import com.example.apk_administration.ui.theme.products.ProductoApiService
 import com.example.apk_administration.ui.theme.products.ProductoApiServiceC
 import com.example.apk_administration.ui.theme.products.ProductoDetailScreen
 import com.example.apk_administration.ui.theme.registros.RegistroScreen
@@ -43,14 +46,15 @@ fun NavigationHost(
     categoryApiService: CategoryApiService,
     productoApiServiceC: ProductoApiServiceC,
     activity: Activity,
-    productViewModel: ProductViewModel
+    productViewModel: ProductViewModel,
+    productoApiService: ProductoApiService
 ) {
     NavHost(navController = navController, startDestination = "home") {
         // Pantalla de login
 
         // Pantalla de Home
         composable("home") {
-            HomeScreen(padding, navController)
+            HomeScreen(padding, navController, productoApiService)
 
         }
         composable("nfc") {
@@ -75,22 +79,25 @@ fun NavigationHost(
         }
 
         // Pantallas de productos
-        composable("admProducts"){ProductManagementScreen(navController=navController, servicio=productoApiServiceC)}
+        composable("admProducts"){ProductManagementScreen(navController=navController, servicio=productoApiService)}
         composable("product_form") { ProductForm(navController=navController,servicio= productoApiServiceC,0) }
         composable("productoEditar/{id}", arguments = listOf(
             navArgument("id") { type = NavType.IntType })
         ) {
-            ProductForm(navController, productoApiServiceC, it.arguments!!.getInt("id"))
+            AddOrEditProductScreen(navController, productoApiService, it.arguments!!.getInt("id"))
         }
         composable("productoDel/{id}", arguments = listOf(
             navArgument("id") { type = NavType.IntType })
         ) {
-            ContenidoProductoEliminar(navController, productoApiServiceC, it.arguments!!.getInt("id"))
+            ContenidoProductoEliminar(navController, productoApiService, it.arguments!!.getInt("id"))
         }
         composable("productoVer/{id}", arguments = listOf(
             navArgument("id") { type = NavType.StringType })
         ) {
             ProductoDetailScreen(it.arguments!!.getString("id")!!, navController, productoApiServiceC)
+        }
+        composable("AddProduct") {
+            AddOrEditProductScreen( navController = navController,servicio = productoApiService, 0)
         }
 
         //Pantallas de categorias

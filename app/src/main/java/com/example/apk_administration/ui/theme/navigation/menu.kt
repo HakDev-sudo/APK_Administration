@@ -38,6 +38,7 @@ import com.example.apk_administration.ui.theme.NFC.NfcApiService
 import com.example.apk_administration.ui.theme.account.AuthNavHost
 import com.example.apk_administration.ui.theme.home.HomeScreen
 import com.example.apk_administration.ui.theme.products.ProductViewModel
+import com.example.apk_administration.ui.theme.products.ProductoApiService
 import com.example.apk_administration.ui.theme.products.ProductoApiServiceC
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
@@ -48,7 +49,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 @Composable
 fun AlmacenApp() {
     // Configuración de Retrofit y creación de servicios API
-    val urlBase = "http://192.168.18.33:8000/" // o tu IP si usarás un dispositivo externo
+    val urlBase = "http://10.0.2.2:8000/" // o tu IP si usarás un dispositivo externo
     val retrofit = Retrofit.Builder().baseUrl(urlBase)
         .addConverterFactory(GsonConverterFactory.create()).build()
 
@@ -56,17 +57,19 @@ fun AlmacenApp() {
     val nfcApiService = retrofit.create(NfcApiService::class.java)
     val categoryApiService = retrofit.create(CategoryApiService::class.java)
     val productoApiServiceC = retrofit.create(ProductoApiServiceC::class.java)
-    val productViewModel = ProductViewModel(productoApiServiceC)
+
     // Inicializar el NavController
     val navController = rememberNavController()
-
+    val productoApiService = retrofit.create(ProductoApiService::class.java)
+    val productViewModel = ProductViewModel(productoApiService)
     // Llamar al CustomScaffold y pasar los servicios API como parámetros
     CustomScaffold(
         navController = navController,
         nfcApiService = nfcApiService,
         categoryApiService = categoryApiService,
         productoApiServiceC = productoApiServiceC,
-        productViewModel = productViewModel
+        productViewModel = productViewModel,
+        productoApiService = productoApiService
 
     )
 }
@@ -78,7 +81,8 @@ fun CustomScaffold(
     nfcApiService: NfcApiService,
     categoryApiService: CategoryApiService,
     productoApiServiceC: ProductoApiServiceC,
-    productViewModel: ProductViewModel
+    productViewModel: ProductViewModel,
+    productoApiService: ProductoApiService
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -112,7 +116,8 @@ fun CustomScaffold(
                             categoryApiService = categoryApiService,
                             productoApiServiceC = productoApiServiceC,
                             activity = navController.context as Activity,
-                            productViewModel = productViewModel
+                            productViewModel = productViewModel,
+                            productoApiService = productoApiService
 
                         )
                     }

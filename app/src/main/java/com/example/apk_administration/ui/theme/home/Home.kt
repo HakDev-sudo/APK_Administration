@@ -26,17 +26,41 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.apk_administration.R
+import com.example.apk_administration.ui.theme.products.ProductoApiService
 
 
 // Acá escribiras tu
 @Composable
-fun HomeScreen(padding: PaddingValues, navController: NavHostController) {
+fun HomeScreen(
+    padding: PaddingValues,
+    navController: NavHostController,
+    servicio: ProductoApiService
+) {
+    // Estado para almacenar el total del stock
+    var totalStock by remember { mutableStateOf(0) }
+    var isLoading by remember { mutableStateOf(true) }
+    // Obtener y calcular el stock total
+    LaunchedEffect(Unit) {
+        val response = servicio.selectProductos()
+        if (response.isNotEmpty()) {
+            // Suma el stock de todos los productos
+            totalStock = response.sumOf { it.stock ?: 0 } // Usa 0 si `stock` es null
+        }
+        isLoading = false
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -56,7 +80,13 @@ fun HomeScreen(padding: PaddingValues, navController: NavHostController) {
         QuickActionButtons(navController = navController)
         Spacer(modifier = Modifier.height(16.dp))
         // Panel de estado
-        StatusCard(title = "Inventario actual", value = "1200 items", icon = Icons.Filled.Inventory)
+
+        // Panel de estado
+        if (isLoading) {
+            CircularProgressIndicator() // Indicador de carga
+        } else {
+            StatusCard(title = "Inventario actual", value = "$totalStock items", icon = Icons.Filled.Inventory)
+        }
         StatusCard(title = "Pendiente de entrada", value = "300 items", icon = Icons.Filled.Input)
 
     }
@@ -82,13 +112,3 @@ fun StatusCard(title: String, value: String, icon: ImageVector) {
     }
 }
 
-
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    val navController = rememberNavController()  // Crear NavController
-    HomeScreen(padding = PaddingValues(0.dp), navController = navController)
-}

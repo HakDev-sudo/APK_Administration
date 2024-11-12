@@ -37,7 +37,7 @@ fun ProductManagementTopBar(navController: NavHostController) {
     TopAppBar(
         title = { Text("Administrar Productos", fontSize = 20.sp, fontWeight = FontWeight.Bold) },
         actions = {
-            IconButton(onClick = { navController.navigate("product_form") }) {
+            IconButton(onClick = { navController.navigate("AddProduct") }) {
                 Icon(Icons.Default.Add, contentDescription = "Agregar Producto")
             }
             IconButton(onClick = { /* Acción para filtrar productos */ }) {
@@ -49,7 +49,12 @@ fun ProductManagementTopBar(navController: NavHostController) {
 
 // Componente para mostrar cada producto en una tarjeta
 @Composable
-fun ProductCard(product: ProductoModelGet, navController: NavHostController) {
+fun ProductCard(
+    product: ProductModel,
+    navController: NavHostController,
+    categoryName: String, // Nombre de la categoría
+
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -67,13 +72,11 @@ fun ProductCard(product: ProductoModelGet, navController: NavHostController) {
             ) {
                 Text(text = product.name, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = "Cantidad: ${product.stock}", fontSize = 14.sp, color = if (product.stock > 0) Color.Gray else Color.Red)
+                Text(text = "Cantidad: ${product.stock ?: "N/A"}", fontSize = 14.sp, color = if (product.stock ?: 0 > 0) Color.Gray else Color.Red)
                 Text(text = "Precio: $${product.price}", fontSize = 14.sp, color = Color.Gray)
-                Text(text = "Categoría: ${product.category.name}", fontSize = 14.sp, color = Color.Gray)
+                Text(text = "Categoría: $categoryName", fontSize = 14.sp, color = Color.Gray)
 
-                product.idNFC?.let {
-                    Text(text = "NFC: ${it.id_tag}", fontSize = 14.sp, color = Color.Gray)
-                }
+
             }
 
             // Botones de editar y eliminar producto
@@ -89,30 +92,43 @@ fun ProductCard(product: ProductoModelGet, navController: NavHostController) {
     }
 }
 
-
 // Lista de productos usando LazyColumn
 @Composable
-fun ProductList(products: List<ProductoModelGet>, navController: NavHostController) {
+fun ProductList(
+    products: List<ProductModel>,
+    navController: NavHostController,
+    categories: Map<Int, String>, // Mapear categoría ID a nombre
+    nfcs: Map<Int, String> // Mapear NFC ID a etiqueta
+) {
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
         items(products) { product ->
+            val categoryName = categories[product.category] ?: "Sin categoría"
+
             ProductCard(
                 product = product,
                 navController = navController,
+                categoryName = categoryName
+
             )
         }
     }
 }
 
-
 // Pantalla completa de administración de productos
 @Composable
-fun ProductManagementScreen(servicio: ProductoApiServiceC, navController: NavHostController) {
-    var productos by remember { mutableStateOf(emptyList<ProductoModelGet>()) }
+fun ProductManagementScreen(servicio: ProductoApiService, navController: NavHostController) {
+    var productos by remember { mutableStateOf(emptyList<ProductModel>()) }
+    var categorias by remember { mutableStateOf(mapOf<Int, String>()) }
+    var nfcs by remember { mutableStateOf(mapOf<Int, String>()) }
 
     LaunchedEffect(Unit) {
         productos = servicio.selectProductos()
+
+        // Cargar categorías y NFCs
+        categorias = servicio.selectCategories().associate { it.id to it.name }
+        nfcs = servicio.selectnfcs().associate { it.id to it.id_tag }
     }
 
     Column(
@@ -124,10 +140,13 @@ fun ProductManagementScreen(servicio: ProductoApiServiceC, navController: NavHos
         // Lista de productos
         ProductList(
             products = productos,
-            navController = navController
+            navController = navController,
+            categories = categorias,
+            nfcs = nfcs
         )
     }
 }
+
 
 
 

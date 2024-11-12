@@ -1,19 +1,32 @@
 package com.example.apk_administration.ui.theme.products
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.apk_administration.ui.theme.Category.CategoryModel
+import com.example.apk_administration.ui.theme.NFC.NfcModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class ProductViewModel(private val apiService: ProductoApiServiceC) : ViewModel() {
-    private val _productList = MutableStateFlow<List<ProductoModelGet>>(emptyList())
-    val productList: StateFlow<List<ProductoModelGet>> = _productList
+class ProductViewModel(private val apiService: ProductoApiService) : ViewModel() {
+
+    // Lista de productos usando el nuevo modelo ProductModel
+    private val _productList = MutableStateFlow<List<ProductModel>>(emptyList())
+    val productList: StateFlow<List<ProductModel>> = _productList
+    // Lista de categorías para almacenar los datos cargados desde el servicio
+    private val _categoryList = MutableStateFlow<List<CategoryModel>>(emptyList())
+    val categoryList: StateFlow<List<CategoryModel>> = _categoryList
+    // Lista de etiquetas NFC
+    private val _nfcList = MutableStateFlow<List<NfcModel>>(emptyList())
+    val nfcList: StateFlow<List<NfcModel>> = _nfcList
 
     init {
         loadProducts()
+        loadCategories()
+        loadNfcs()
     }
 
     private fun loadProducts() {
@@ -23,6 +36,27 @@ class ProductViewModel(private val apiService: ProductoApiServiceC) : ViewModel(
                 _productList.value = products
             } catch (e: Exception) {
                 // Manejo de errores
+                Log.e("ProductViewModel", "Error al cargar productos: ${e.message}")
+            }
+        }
+    }
+    private fun loadCategories() {
+        viewModelScope.launch {
+            try {
+                val categories = apiService.selectCategories() // Obtiene las categorías de la API
+                _categoryList.value = categories // Asigna las categorías obtenidas
+            } catch (e: Exception) {
+                Log.e("ProductViewModel", "Error al cargar categorías: ${e.message}")
+            }
+        }
+    }
+    private fun loadNfcs() {
+        viewModelScope.launch {
+            try {
+                val nfcs = apiService.selectnfcs() // Obtiene las etiquetas NFC de la API
+                _nfcList.value = nfcs // Asigna las etiquetas NFC obtenidas
+            } catch (e: Exception) {
+                Log.e("ProductViewModel", "Error al cargar etiquetas NFC: ${e.message}")
             }
         }
     }
@@ -33,5 +67,14 @@ class ProductViewModel(private val apiService: ProductoApiServiceC) : ViewModel(
 
     fun refreshProducts() {
         loadProducts() // Vuelve a cargar los productos desde la API
+    }
+    // Método para refrescar las categorías
+    fun refreshCategories() {
+        loadCategories() // Vuelve a cargar las categorías desde la API
+    }
+
+    // Método para refrescar las etiquetas NFC
+    fun refreshNfcs() {
+        loadNfcs() // Vuelve a cargar las etiquetas NFC desde la API
     }
 }

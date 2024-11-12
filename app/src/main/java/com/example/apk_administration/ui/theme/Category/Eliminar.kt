@@ -36,7 +36,7 @@ fun ContenidoCategoryEliminar(navController: NavHostController, servicio: Catego
             dismissButton = {
                 Button(onClick = {
                     showDialog = false
-                    navController.navigate("categorias") // Navegar de vuelta si se cancela
+                    navController.navigate("categoryList") // Navegar de vuelta si se cancela
                 }) {
                     Text("Cancelar")
                 }
@@ -50,7 +50,7 @@ fun ContenidoCategoryEliminar(navController: NavHostController, servicio: Catego
             try {
                 val response = servicio.deleteCategory(categoryId.toString())
                 if (response.isSuccessful) {
-                    navController.navigate("categorias") {
+                    navController.navigate("categoryList") {
                         popUpTo("categorias") { inclusive = true } // Regresar a la lista de categorías
                     }
                 } else {

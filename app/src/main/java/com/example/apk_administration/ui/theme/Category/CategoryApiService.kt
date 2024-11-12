@@ -10,19 +10,19 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface CategoryApiService {
-    @GET("categories")
+    @GET("api/categorias")
     suspend fun selectCategories(): List<CategoryModel>
 
-    @GET("categories/{id}/")
+    @GET("pi/categoria/{id}")
     suspend fun selectCategory(@Path("id") id: String): Response<CategoryModel>
 
     @Headers("Content-Type: application/json")
-    @POST("categories/")
+    @POST("api/categorias")
     suspend fun insertCategory(@Body category: CategoryModel): Response<CategoryModel>
 
-    @PUT("categories/{id}/")
+    @PUT("api/categoria/{id}")
     suspend fun updateCategory(@Path("id") id: String, @Body category: CategoryModel): Response<CategoryModel>
 
-    @DELETE("categories/{id}/")
+    @DELETE("api/categoria/{id}")
     suspend fun deleteCategory(@Path("id") id: String): Response<CategoryModel>
 }
