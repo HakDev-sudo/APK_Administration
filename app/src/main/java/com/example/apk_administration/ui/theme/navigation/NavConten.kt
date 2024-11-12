@@ -26,7 +26,6 @@ import com.example.apk_administration.ui.theme.home.HomeScreen
 import com.example.apk_administration.ui.theme.login.LoginStructre
 import com.example.apk_administration.ui.theme.products.AddOrEditProductScreen
 import com.example.apk_administration.ui.theme.products.ContenidoProductoEliminar
-import com.example.apk_administration.ui.theme.products.ProductForm
 import com.example.apk_administration.ui.theme.products.ProductManagementScreen
 import com.example.apk_administration.ui.theme.products.ProductModel
 import com.example.apk_administration.ui.theme.products.ProductViewModel
@@ -80,7 +79,9 @@ fun NavigationHost(
 
         // Pantallas de productos
         composable("admProducts"){ProductManagementScreen(navController=navController, servicio=productoApiService)}
-        composable("product_form") { ProductForm(navController=navController,servicio= productoApiServiceC,0) }
+        composable("AddProduct") {
+            AddOrEditProductScreen( navController = navController,servicio = productoApiService, 0)
+        }
         composable("productoEditar/{id}", arguments = listOf(
             navArgument("id") { type = NavType.IntType })
         ) {
@@ -96,9 +97,7 @@ fun NavigationHost(
         ) {
             ProductoDetailScreen(it.arguments!!.getString("id")!!, navController, productoApiServiceC)
         }
-        composable("AddProduct") {
-            AddOrEditProductScreen( navController = navController,servicio = productoApiService, 0)
-        }
+
 
         //Pantallas de categorias
         composable("categoryList") {
