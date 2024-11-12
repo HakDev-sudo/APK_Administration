@@ -34,31 +34,28 @@ fun DrawerContent(navController: NavHostController) {
     val navBackStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry.value?.destination?.route
 
-    Column(
+    Box(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp) // Ajuste para mejorar la apariencia
+            .fillMaxWidth(0.8f)
+            .fillMaxHeight()
+            .background(Color.White) // Fondo blanco
     ) {
-        Text(
-            text = "Menú",
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(bottom = 16.dp) // Espacio debajo del título
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "Menú",
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
 
-        items.forEach { item ->
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth() // Alinea el contenido a la izquierda llenando el ancho disponible
-                    .padding(vertical = 4.dp) // Espacio entre cada ítem
-            ) {
+            items.forEach { item ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .fillMaxWidth() // Que el ítem ocupe todo el ancho
-                        .background(
-                            if (currentRoute == item.route) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-                            else Color.Transparent
-                        )
+                        .fillMaxWidth()
                         .clickable {
                             navController.navigate(item.route) {
                                 popUpTo(navController.graph.startDestinationId) {
@@ -68,23 +65,20 @@ fun DrawerContent(navController: NavHostController) {
                                 restoreState = true
                             }
                         }
-                        .padding(8.dp) // Espaciado interno en cada ítem
+                        .padding(vertical = 8.dp)
+                        .background(
+                            if (currentRoute == item.route) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                            else Color.Transparent
+                        )
                 ) {
-                    item.icon() // Ícono del elemento
-                    Spacer(modifier = Modifier.width(16.dp)) // Separador entre el ícono y el texto
+                    item.icon()
+                    Spacer(modifier = Modifier.width(16.dp))
                     Text(
                         text = item.title,
-                        style = MaterialTheme.typography.bodyLarge, // Tamaño de texto adecuado para ítems de lista
-                        modifier = Modifier.weight(1f) // Hace que el texto ocupe todo el espacio restante
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = if (currentRoute == item.route) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
                     )
                 }
-
-                // Separador entre los elementos, sin bordes circulares
-                Divider(
-                    color = Color.LightGray,
-                    thickness = 1.dp,
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
             }
         }
     }
