@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.apk_administration.ui.theme.products.ProductModel
 import com.example.apk_administration.ui.theme.products.ProductViewModel
 import com.example.apk_administration.ui.theme.products.ProductoApiServiceC
 import com.example.apk_administration.ui.theme.products.ProductoModelGet
@@ -87,8 +88,9 @@ fun ProductNFCReaderScreen(
 ) {
     val nfcId by nfcManager.nfcId.collectAsState()
     val productList by viewModel.productList.collectAsState()
-    var matchedProduct by remember { mutableStateOf<ProductoModelGet?>(null) }
-    val scannedProducts = remember { mutableStateListOf<ProductoModelGet>() }
+    val nfcList by viewModel.nfcList.collectAsState()
+    var matchedProduct by remember { mutableStateOf<ProductModel?>(null) }
+    val scannedProducts = remember { mutableStateListOf<ProductModel>() }
     val snackbarHostState = remember { SnackbarHostState() }
 
     // Estado para el monto total de los productos escaneados
@@ -104,19 +106,41 @@ fun ProductNFCReaderScreen(
     }
 
     // Efecto para actualizar `matchedProduct` y agregar a `scannedProducts` cada vez que cambia `nfcId`
-    LaunchedEffect(nfcId) {
+    LaunchedEffect(nfcId) { // Este efecto se ejecuta cada vez que se detecta un nuevo `nfcId`
+        if (nfcList.isEmpty()) {
+            snackbarHostState.showSnackbar("No se han cargado las etiquetas NFC")
+            return@LaunchedEffect
+        }
+
         nfcId?.let { idTag ->
-            //matchedProduct = productList.find { it.idNFC?.id_tag == idTag }
-            if (matchedProduct != null && !scannedProducts.contains(matchedProduct)) {
-                // Agrega el producto encontrado a la lista de productos escaneados
-                scannedProducts.add(matchedProduct!!)
-                // Actualiza el monto total
-                totalAmount += matchedProduct!!.price
-            } else if (matchedProduct == null) {
-                snackbarHostState.showSnackbar("No se encontró ningún producto vinculado")
+            // Paso 1: Buscar la etiqueta NFC en la lista `nfcList` usando el `idTag`
+            val matchedNfc = nfcList.find { it.idTag == idTag }
+
+            if (matchedNfc == null) {
+                snackbarHostState.showSnackbar("No se encontró ninguna etiqueta NFC con idTag: $idTag")
+            }
+
+            // Paso 2: Si se encuentra la etiqueta, buscar el producto en `productList` usando el ID de producto vinculado
+            matchedProduct = matchedNfc?.let { nfc ->
+                productList.find { it.id == nfc.product }
+            }
+
+            // Paso 3: Si se encontró el producto, mostrar sus datos; si no, mostrar mensaje de error
+            matchedProduct?.let { product ->
+                // Agrega el producto a la lista de productos escaneados si aún no está en ella
+                if (!scannedProducts.contains(product)) {
+                    scannedProducts.add(product)
+                    totalAmount += product.price
+                }
+                
+            } ?: run {
+                // Mostrar mensaje si no se encontró ningún producto vinculado
+                snackbarHostState.showSnackbar("No se encontró ningún producto vinculado a esta etiqueta NFC")
             }
         }
     }
+
+
 
     // Interfaz de usuario para mostrar el producto vinculado o un mensaje si no se encuentra
     Column(

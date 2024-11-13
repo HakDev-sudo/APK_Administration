@@ -36,7 +36,7 @@ fun ConfirmationDialog(
         text = {
             Column {
                 Text("ID de la etiqueta: $nfcId")
-                Text("Estado: Sin Asignar")
+                Text("Estado: Asignado")
                 Text("Fecha Asignado: $fechaDeHoy") // Fecha actual como ejemplo
                 // Selección del producto
                 Text("Seleccionar Producto:")

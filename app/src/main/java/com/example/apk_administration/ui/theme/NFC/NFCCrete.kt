@@ -116,7 +116,7 @@ fun NFCReaderScreen(
             val newNfc = NfcModel(
                 id = 0,
                 idTag = nfcId ?: "", // Asegúrate de que coincida con el nombre correcto
-                status = "Sin Asignar",
+                status = "Asignado",
                 fechaAsignado = "$fechaDeHoy",
                 product = selectedProduct?.id  // Se pasa null o el ID del producto si lo tienes
             )

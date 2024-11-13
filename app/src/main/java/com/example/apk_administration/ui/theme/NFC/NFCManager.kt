@@ -79,4 +79,5 @@ class NFCManager(private val activity: Activity, val apiService: NfcApiService) 
             false // Retorna falso si ocurre un error
         }
     }
+
 }

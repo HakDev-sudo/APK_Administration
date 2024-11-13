@@ -31,6 +31,6 @@ interface ProductoApiService {
     suspend fun selectCategories(): List<CategoryModel>
 
     // Nueva función para obtener etiquetas RFID
-    @GET("api/uid")
+    @GET("api/nfc")
     suspend fun selectnfcs(): List<NfcModel>
 }
