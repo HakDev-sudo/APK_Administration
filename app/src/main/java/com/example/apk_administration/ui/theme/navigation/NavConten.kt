@@ -5,6 +5,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.runtime.collectAsState
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -118,7 +119,9 @@ fun NavigationHost(
         }
 
         //Pantallas NFC
-        composable("nfc_reader") { NFCReaderScreen(activity, nfcApiService ) }
+        composable("nfc_reader") {
+            val products = productViewModel.productList.collectAsState().value
+            NFCReaderScreen(activity, nfcApiService, products = products ) }
         composable("nfc_producto") {
             ProductNFCReader(activity, productViewModel, nfcApiService)
         }

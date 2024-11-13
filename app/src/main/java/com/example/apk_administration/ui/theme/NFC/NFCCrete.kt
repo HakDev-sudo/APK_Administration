@@ -17,13 +17,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.Dialog
+import com.example.apk_administration.ui.theme.products.ProductModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun NFCReaderScreen(activity: Activity, apiService: NfcApiService) {
+fun NFCReaderScreen(
+    activity: Activity,
+    apiService: NfcApiService,
+    products: List<ProductModel>) {
     // Inicializa NFCManager y los estados necesarios
     val nfcManager = remember { NFCManager(activity, apiService) }
     val isNFCEnabled = remember { mutableStateOf(nfcManager.isNFCEnabled()) }
@@ -47,7 +51,8 @@ fun NFCReaderScreen(activity: Activity, apiService: NfcApiService) {
         },
         onUpdateNFCStatus = { isEnabled ->
             isNFCEnabled.value = isEnabled
-        }
+        },
+        products = products
     )
 }
 
@@ -60,7 +65,8 @@ fun NFCReaderScreen(
     onActivateReader: () -> Unit,
     onDeactivateReader: () -> Unit,
     onClearNFCId: () -> Unit, // Nueva función para limpiar el ID después de la lectura
-    onUpdateNFCStatus: (Boolean) -> Unit
+    onUpdateNFCStatus: (Boolean) -> Unit,
+    products: List<ProductModel>
 ) {
     val nfcId by nfcManager.nfcId.collectAsState()
     var showLoadingDialog by remember { mutableStateOf(false) }
@@ -104,7 +110,7 @@ fun NFCReaderScreen(
     }
 
     // Función para registrar el NFC
-    fun registerNFC() {
+    fun registerNFC(selectedProduct: ProductModel?) {
         coroutineScope.launch {
             // Crea el modelo NFC con los datos leídos; aquí product es null inicialmente porque no está asignado
             val newNfc = NfcModel(
@@ -112,7 +118,7 @@ fun NFCReaderScreen(
                 idTag = nfcId ?: "", // Asegúrate de que coincida con el nombre correcto
                 status = "Sin Asignar",
                 fechaAsignado = "$fechaDeHoy",
-                product = null // Se pasa null o el ID del producto si lo tienes
+                product = selectedProduct?.id  // Se pasa null o el ID del producto si lo tienes
             )
 
             // Llama al servicio API para insertar el nuevo NFC
@@ -235,8 +241,9 @@ fun NFCReaderScreen(
     if (showConfirmationDialog && nfcId != null  ) {
         ConfirmationDialog(
             nfcId = nfcId,
-            onConfirm = {
-                registerNFC() // Llama a la función para registrar en la API
+            products = products,
+            onConfirm = {selectedProduct ->
+                registerNFC(selectedProduct) // Llama a la función para registrar en la API
             },
             onCancel = {
                 onClearNFCId()
