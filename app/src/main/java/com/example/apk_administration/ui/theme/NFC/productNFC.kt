@@ -25,6 +25,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -90,7 +91,8 @@ fun ProductNFCReaderScreen(
     val productList by viewModel.productList.collectAsState()
     val nfcList by viewModel.nfcList.collectAsState()
     var matchedProduct by remember { mutableStateOf<ProductModel?>(null) }
-    val scannedProducts = remember { mutableStateListOf<ProductModel>() }
+    val scannedProducts = remember { mutableStateMapOf<Pair<ProductModel, String>, Int>() }
+    val scannedNfcTags = remember { mutableSetOf<String>() }
     val snackbarHostState = remember { SnackbarHostState() }
 
     // Estado para el monto total de los productos escaneados
@@ -105,44 +107,36 @@ fun ProductNFCReaderScreen(
         }
     }
 
-    // Efecto para actualizar `matchedProduct` y agregar a `scannedProducts` cada vez que cambia `nfcId`
-    LaunchedEffect(nfcId) { // Este efecto se ejecuta cada vez que se detecta un nuevo `nfcId`
+    // Efecto para procesar cada nueva lectura NFC
+    LaunchedEffect(nfcId) {
         if (nfcList.isEmpty()) {
             snackbarHostState.showSnackbar("No se han cargado las etiquetas NFC")
             return@LaunchedEffect
         }
 
         nfcId?.let { idTag ->
-            // Paso 1: Buscar la etiqueta NFC en la lista `nfcList` usando el `idTag`
-            val matchedNfc = nfcList.find { it.idTag == idTag }
-
-            if (matchedNfc == null) {
-                snackbarHostState.showSnackbar("No se encontró ninguna etiqueta NFC con idTag: $idTag")
-            }
-
-            // Paso 2: Si se encuentra la etiqueta, buscar el producto en `productList` usando el ID de producto vinculado
-            matchedProduct = matchedNfc?.let { nfc ->
-                productList.find { it.id == nfc.product }
-            }
-
-            // Paso 3: Si se encontró el producto, mostrar sus datos; si no, mostrar mensaje de error
-            matchedProduct?.let { product ->
-                // Agrega el producto a la lista de productos escaneados si aún no está en ella
-                if (!scannedProducts.contains(product)) {
-                    scannedProducts.add(product)
-                    totalAmount += product.price
+            if (scannedNfcTags.contains(idTag)) {
+                snackbarHostState.showSnackbar("Etiqueta NFC ya registrada")
+            } else {
+                // Buscar producto y agregarlo junto con su `idTag`
+                val matchedNfc = nfcList.find { it.idTag == idTag }
+                matchedProduct = matchedNfc?.let { nfc ->
+                    productList.find { it.id == nfc.product }
                 }
-                
-            } ?: run {
-                // Mostrar mensaje si no se encontró ningún producto vinculado
-                snackbarHostState.showSnackbar("No se encontró ningún producto vinculado a esta etiqueta NFC")
+
+                matchedProduct?.let { product ->
+                    // Usar el par (producto, idTag) como clave para escaneos únicos
+                    val productKey = product to idTag
+                    scannedNfcTags.add(idTag)
+                    scannedProducts[productKey] = (scannedProducts[productKey] ?: 0) + 1
+                    totalAmount += product.price
+                } ?: snackbarHostState.showSnackbar("No se encontró ningún producto vinculado a esta etiqueta NFC")
             }
+            onClearNFCId()
         }
     }
 
-
-
-    // Interfaz de usuario para mostrar el producto vinculado o un mensaje si no se encuentra
+    // Interfaz de usuario para mostrar los productos escaneados y permitir eliminarlos
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -150,8 +144,8 @@ fun ProductNFCReaderScreen(
     ) {
         SnackbarHost(hostState = snackbarHostState)
 
+        // Mostrar información del último producto escaneado
         if (matchedProduct != null) {
-            // Mostrar la información del producto encontrado
             Text("Producto Escaneado: ${matchedProduct!!.name}")
             Text("Precio: ${matchedProduct!!.price}")
         } else {
@@ -178,11 +172,14 @@ fun ProductNFCReaderScreen(
             }
         }
 
-        // Mostrar la lista de productos escaneados
+        // Lista de productos escaneados con la cantidad y subtotal
         Text("Productos Escaneados:", style = MaterialTheme.typography.labelMedium)
-
         LazyColumn {
-            items(scannedProducts) { product ->
+            items(scannedProducts.keys.toList()) { productKey ->
+                val (product, idTag) = productKey
+                val quantity = scannedProducts[productKey] ?: 0
+                val subtotal = product.price * quantity
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -194,12 +191,24 @@ fun ProductNFCReaderScreen(
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text("Nombre: ${product.name}")
-                        Text("Precio: ${product.price}")
+                        Text("Precio Unitario: ${product.price}")
+                        Text("Cantidad: $quantity")
+                        Text("Subtotal: $${"%.2f".format(subtotal)}", fontWeight = FontWeight.Bold)
                     }
-                    // Icono de basura para eliminar el producto
+
+                    // Botón para eliminar el producto de la lista
                     IconButton(onClick = {
-                        scannedProducts.remove(product)
-                        totalAmount -= product.price // Actualiza el monto total al eliminar
+                        val productKey = product to idTag // Utilizar la clave de producto con su `idTag`
+
+                        // Actualizar cantidad o eliminar completamente el producto
+                        if (scannedProducts[productKey]!! > 1) {
+                            scannedProducts[productKey] = scannedProducts[productKey]!! - 1
+                            totalAmount -= product.price
+                        } else {
+                            scannedProducts.remove(productKey)
+                            totalAmount -= product.price
+                            scannedNfcTags.remove(idTag) // Eliminar `idTag` asociado con el producto
+                        }
                     }) {
                         Icon(
                             imageVector = Icons.Default.Delete,
@@ -219,5 +228,6 @@ fun ProductNFCReaderScreen(
         )
     }
 }
+
 
 
