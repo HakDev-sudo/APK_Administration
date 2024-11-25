@@ -40,6 +40,7 @@ import com.example.apk_administration.ui.theme.products.ProductModel
 import com.example.apk_administration.ui.theme.products.ProductViewModel
 import com.example.apk_administration.ui.theme.products.ProductoApiServiceC
 import com.example.apk_administration.ui.theme.products.ProductoModelGet
+import com.example.apk_administration.ui.theme.stock.StockMovementViewModel
 import kotlinx.coroutines.launch
 
 
@@ -47,7 +48,9 @@ import kotlinx.coroutines.launch
 fun ProductNFCReader(
     activity: Activity,
     viewModel: ProductViewModel,
-    apiService: NfcApiService) {
+    apiService: NfcApiService,
+    stockMovementViewModel: StockMovementViewModel
+) {
 
     LaunchedEffect(Unit) {
         viewModel.refreshProducts()
@@ -73,7 +76,8 @@ fun ProductNFCReader(
         },
         onClearNFCId = {
             nfcManager.clearNFCId()
-        }
+        },
+        stockMovementViewModel = stockMovementViewModel
     )
 }
 
@@ -85,7 +89,8 @@ fun ProductNFCReaderScreen(
     isReaderActive: Boolean,
     onActivateReader: () -> Unit,
     onDeactivateReader: () -> Unit,
-    onClearNFCId: () -> Unit
+    onClearNFCId: () -> Unit,
+    stockMovementViewModel: StockMovementViewModel,
 ) {
     val nfcId by nfcManager.nfcId.collectAsState()
     val productList by viewModel.productList.collectAsState()
@@ -226,6 +231,32 @@ fun ProductNFCReaderScreen(
             style = MaterialTheme.typography.labelMedium,
             modifier = Modifier.padding(top = 16.dp)
         )
+        // Nuevo botón para registrar la salida de los productos escaneados
+        Button(
+            onClick = {
+                scannedProducts.forEach { (productKey, quantity) ->
+                    val (product, idTag) = productKey
+                    val nfcTagId = nfcList.find { it.idTag == idTag }?.id
+
+                    nfcTagId?.let { tagId ->
+                        stockMovementViewModel.registerProductExit(
+                            productId = product.id,
+                            nfcTagId = tagId,
+                            quantity = quantity,
+                            description = "Salida de producto registrada desde el lector NFC"
+                        )
+                    }
+                }
+
+                // Limpiar la lista de productos escaneados y el monto total después de registrar la salida
+                scannedProducts.clear()
+                scannedNfcTags.clear()
+                totalAmount = 0.0
+            },
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(text = "Registrar Salida")
+        }
     }
 }
 

@@ -40,6 +40,8 @@ import com.example.apk_administration.ui.theme.home.HomeScreen
 import com.example.apk_administration.ui.theme.products.ProductViewModel
 import com.example.apk_administration.ui.theme.products.ProductoApiService
 import com.example.apk_administration.ui.theme.products.ProductoApiServiceC
+import com.example.apk_administration.ui.theme.stock.StockMovementApiService
+import com.example.apk_administration.ui.theme.stock.StockMovementViewModel
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -49,7 +51,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 @Composable
 fun AlmacenApp() {
     // Configuración de Retrofit y creación de servicios API
-    val urlBase = "http://10.0.2.2:8000/" // o tu IP si usarás un dispositivo externo
+    val urlBase = "http://192.168.18.33:8000/" // o tu IP si usarás un dispositivo externo
     val retrofit = Retrofit.Builder().baseUrl(urlBase)
         .addConverterFactory(GsonConverterFactory.create()).build()
 
@@ -62,6 +64,9 @@ fun AlmacenApp() {
     val navController = rememberNavController()
     val productoApiService = retrofit.create(ProductoApiService::class.java)
     val productViewModel = ProductViewModel(productoApiService)
+    val stockMovementApiService = retrofit.create(StockMovementApiService::class.java)
+    val stockMovementViewModel = StockMovementViewModel(stockMovementApiService, nfcApiService)
+
     // Llamar al CustomScaffold y pasar los servicios API como parámetros
     CustomScaffold(
         navController = navController,
@@ -69,7 +74,8 @@ fun AlmacenApp() {
         categoryApiService = categoryApiService,
         productoApiServiceC = productoApiServiceC,
         productViewModel = productViewModel,
-        productoApiService = productoApiService
+        productoApiService = productoApiService,
+        stockMovementViewModel = stockMovementViewModel
 
     )
 }
@@ -82,7 +88,8 @@ fun CustomScaffold(
     categoryApiService: CategoryApiService,
     productoApiServiceC: ProductoApiServiceC,
     productViewModel: ProductViewModel,
-    productoApiService: ProductoApiService
+    productoApiService: ProductoApiService,
+    stockMovementViewModel: StockMovementViewModel
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -90,9 +97,12 @@ fun CustomScaffold(
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            DrawerContent(navController)
-        },
-        modifier = Modifier.background(MaterialTheme.colorScheme.background)
+            DrawerContent(
+                navController = navController,
+                drawerState = drawerState,
+                scope = scope
+            )
+        }
     ) {
         Box(modifier = Modifier
             .fillMaxSize()
@@ -117,7 +127,8 @@ fun CustomScaffold(
                             productoApiServiceC = productoApiServiceC,
                             activity = navController.context as Activity,
                             productViewModel = productViewModel,
-                            productoApiService = productoApiService
+                            productoApiService = productoApiService,
+                            stockMovementViewModel = stockMovementViewModel
 
                         )
                     }

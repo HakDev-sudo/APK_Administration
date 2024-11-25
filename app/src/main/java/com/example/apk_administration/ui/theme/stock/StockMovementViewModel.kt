@@ -57,7 +57,7 @@ class StockMovementViewModel(
                 if (nfc != null) {
                     val updatedNfc = nfc.copy(
                         status = "sin asignar",
-                        fechaAsignado = getCurrentDate(),
+
                         product = null // Desvincular del producto
                     )
 

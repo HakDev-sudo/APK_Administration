@@ -35,6 +35,7 @@ import com.example.apk_administration.ui.theme.products.ProductoApiServiceC
 import com.example.apk_administration.ui.theme.products.ProductoDetailScreen
 import com.example.apk_administration.ui.theme.registros.RegistroScreen
 import com.example.apk_administration.ui.theme.settings.SettingsScreenContent
+import com.example.apk_administration.ui.theme.stock.StockMovementViewModel
 import com.example.apk_administration.ui.theme.user.PerfilScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -47,7 +48,8 @@ fun NavigationHost(
     productoApiServiceC: ProductoApiServiceC,
     activity: Activity,
     productViewModel: ProductViewModel,
-    productoApiService: ProductoApiService
+    productoApiService: ProductoApiService,
+    stockMovementViewModel: StockMovementViewModel
 ) {
     NavHost(navController = navController, startDestination = "home") {
         // Pantalla de login
@@ -96,7 +98,7 @@ fun NavigationHost(
         composable("productoVer/{id}", arguments = listOf(
             navArgument("id") { type = NavType.StringType })
         ) {
-            ProductoDetailScreen(it.arguments!!.getString("id")!!, navController, productoApiServiceC)
+            ProductoDetailScreen(productId = it.arguments!!.getInt("id"), navController, productoApiService)
         }
 
 
@@ -123,7 +125,7 @@ fun NavigationHost(
             val products = productViewModel.productList.collectAsState().value
             NFCReaderScreen(activity, nfcApiService, products = products ) }
         composable("nfc_producto") {
-            ProductNFCReader(activity, productViewModel, nfcApiService)
+            ProductNFCReader(activity, productViewModel, nfcApiService, stockMovementViewModel)
         }
     }
 }

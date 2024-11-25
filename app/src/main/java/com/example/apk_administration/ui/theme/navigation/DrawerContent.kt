@@ -18,68 +18,55 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 data class DrawerItem(val title: String, val route: String, val icon: @Composable () -> Unit)
 
 @Composable
-fun DrawerContent(navController: NavHostController) {
+fun DrawerContent(navController: NavHostController,drawerState: DrawerState,
+                  scope: CoroutineScope
+) {
     val items = listOf(
         DrawerItem("Inicio", "home") { Icon(Icons.Filled.Home, contentDescription = "Inicio") },
+        DrawerItem("Perfil", "perfil") { Icon(Icons.Filled.Person, contentDescription = "Perfil") },
         DrawerItem("Productos", "admProducts") { Icon(Icons.Filled.Inventory, contentDescription = "Productos") },
         DrawerItem("Usuarios", "admUsers") { Icon(Icons.Filled.People, contentDescription = "Usuarios") },
         DrawerItem("Registros", "registros") { Icon(Icons.Filled.ListAlt, contentDescription = "Registros") },
-        DrawerItem("Configuración", "setting") { Icon(Icons.Filled.Settings, contentDescription = "Configuración") }
+        DrawerItem("Configuración", "setting") { Icon(Icons.Filled.Settings, contentDescription = "Configuración") },
+
     )
 
     val navBackStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry.value?.destination?.route
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth(0.8f)
-            .fillMaxHeight()
-            .background(Color.White) // Fondo blanco
+    ModalDrawerSheet(
+        modifier = Modifier.width(300.dp)  // Fixed width, not percentage-based
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text(
-                text = "Menú",
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
+        Text(
+            text = "Menú",
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.padding(16.dp)
+        )
 
-            items.forEach { item ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            navController.navigate(item.route) {
-                                popUpTo(navController.graph.startDestinationId) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
+        items.forEach { item ->
+            NavigationDrawerItem(
+                label = { Text(item.title) },
+                selected = currentRoute == item.route,
+                icon = { item.icon() },
+                onClick = {
+                    navController.navigate(item.route) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
                         }
-                        .padding(vertical = 8.dp)
-                        .background(
-                            if (currentRoute == item.route) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-                            else Color.Transparent
-                        )
-                ) {
-                    item.icon()
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Text(
-                        text = item.title,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = if (currentRoute == item.route) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
-                    )
-                }
-            }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                    // Close the drawer after navigation
+                    scope.launch { drawerState.close() }
+                },
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
         }
     }
 }
