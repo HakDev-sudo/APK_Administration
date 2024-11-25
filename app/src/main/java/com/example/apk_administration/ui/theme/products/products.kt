@@ -1,15 +1,18 @@
 package com.example.apk_administration.ui.theme.products
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,6 +32,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 
 // Barra superior con botones de agregar y filtro
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,6 +73,36 @@ fun ProductCard(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Imagen circular al inicio
+            Box(
+                modifier = Modifier
+                    .size(60.dp) // Tamaño del círculo
+                    .clip(CircleShape) // Forma circular
+                    .background(Color.LightGray), // Color predeterminado si no hay imagen
+                contentAlignment = Alignment.Center
+            ) {
+                if (product.img.isNullOrEmpty()) {
+                    // Mostramos un icono o texto si no hay imagen
+                    Icon(
+                        imageVector = Icons.Default.Image, // Icono por defecto
+                        contentDescription = "Sin Imagen",
+                        tint = Color.White,
+                        modifier = Modifier.size(30.dp) // Tamaño del icono
+                    )
+                } else {
+                    // Cargamos la imagen desde la URL
+                    AsyncImage(
+                        model = product.img, // URL de la imagen
+                        contentDescription = "Imagen del Producto",
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop // Escalado de la imagen
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
             Column(
                 modifier = Modifier.weight(1f)
             ) {
