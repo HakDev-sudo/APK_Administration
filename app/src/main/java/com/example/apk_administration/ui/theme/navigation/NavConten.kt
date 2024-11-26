@@ -31,7 +31,6 @@ import com.example.apk_administration.ui.theme.products.ProductManagementScreen
 import com.example.apk_administration.ui.theme.products.ProductModel
 import com.example.apk_administration.ui.theme.products.ProductViewModel
 import com.example.apk_administration.ui.theme.products.ProductoApiService
-import com.example.apk_administration.ui.theme.products.ProductoApiServiceC
 import com.example.apk_administration.ui.theme.products.ProductoDetailScreen
 import com.example.apk_administration.ui.theme.registros.RegistroScreen
 import com.example.apk_administration.ui.theme.settings.SettingsScreenContent
@@ -45,7 +44,6 @@ fun NavigationHost(
     padding: PaddingValues,
     nfcApiService: NfcApiService,
     categoryApiService: CategoryApiService,
-    productoApiServiceC: ProductoApiServiceC,
     activity: Activity,
     productViewModel: ProductViewModel,
     productoApiService: ProductoApiService,
@@ -107,12 +105,12 @@ fun NavigationHost(
             CategoryListScreen(navController, categoryApiService)
         }
         composable("categoriaNueva") {
-            ContenidoCategoryEditar(navController, categoryApiService, 0)
+            ContenidoCategoryEditar(navController, categoryApiService, productoApiService,0)
         }
         composable("categoriaEditar/{id}", arguments = listOf(
             navArgument("id") { type = NavType.IntType })
         ) {
-            ContenidoCategoryEditar(navController, categoryApiService, it.arguments!!.getInt("id"))
+            ContenidoCategoryEditar(navController, categoryApiService,productoApiService, it.arguments!!.getInt("id"))
         }
         composable("categoriaDel/{id}", arguments = listOf(
             navArgument("id") { type = NavType.IntType })
@@ -123,7 +121,7 @@ fun NavigationHost(
         //Pantallas NFC
         composable("nfc_reader") {
             val products = productViewModel.productList.collectAsState().value
-            NFCReaderScreen(activity, nfcApiService, products = products ) }
+            NFCReaderScreen(activity, nfcApiService, productViewModel ) }
         composable("nfc_producto") {
             ProductNFCReader(activity, productViewModel, nfcApiService, stockMovementViewModel)
         }

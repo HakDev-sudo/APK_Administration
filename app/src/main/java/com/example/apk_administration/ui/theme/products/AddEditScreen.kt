@@ -29,6 +29,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,6 +40,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -47,7 +49,9 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.input.KeyboardType
+import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import java.io.InputStream
@@ -73,12 +77,14 @@ fun AddOrEditProductScreen(
     // Definir los estados
     var name by remember { mutableStateOf("") }
     var imgUri by remember { mutableStateOf<Uri?>(null) }
+    var existingImgUrl by remember { mutableStateOf<String?>(null) }
     var price by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var categoryId by remember { mutableStateOf("") }
     var categories by remember { mutableStateOf<List<CategoryModel>>(emptyList()) }
     var isSaveRequested by remember { mutableStateOf(false) }
     var isSaveSuccessful by remember { mutableStateOf(false) } // Nuevo estado para navegación
+    var viewModel = ProductViewModel(servicio)
 
     val imageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -95,7 +101,7 @@ fun AddOrEditProductScreen(
                 price = it.price.toString()
                 description = it.description
                 categoryId = it.category.toString()
-                imgUri = it.img?.let { uriString -> Uri.parse(uriString) }
+                existingImgUrl = it.img
             }
         }
     }
@@ -109,33 +115,44 @@ fun AddOrEditProductScreen(
                 val descriptionPart = description.toRequestBody("text/plain".toMediaType())
                 val categoryPart = categoryId.toRequestBody("text/plain".toMediaType())
 
-                val imgPart = imgUri?.let {
-                    val inputStream = context.contentResolver.openInputStream(it)
-                    val bytes = inputStream?.readBytes()
-                    val requestBody = bytes?.toRequestBody("image/*".toMediaType())
-                    requestBody?.let { body -> MultipartBody.Part.createFormData("img", "image.jpg", body) }
+                val imgPart = when {
+                    imgUri != null -> {
+                        // Crear nueva imagen
+                        val inputStream = context.contentResolver.openInputStream(imgUri!!)
+                        val bytes = inputStream?.readBytes()
+                        val requestBody = bytes?.toRequestBody("image/*".toMediaType())
+                        MultipartBody.Part.createFormData("img", "image.jpg", requestBody!!)
+                    }
+                    existingImgUrl != null -> {
+                        // Mantener imagen existente
+                        val requestBody = existingImgUrl!!.toRequestBody("text/plain".toMediaType())
+                        MultipartBody.Part.createFormData("existingImg", "image.jpg", requestBody)
+                    }
+                    else -> null // No hay imagen nueva ni existente
                 }
 
                 val response = if (productoId == 0) {
+                    // Insertar producto nuevo
                     servicio.insertProducto(namePart, pricePart, descriptionPart, categoryPart, imgPart)
                 } else {
+                    // Actualizar producto existente
                     servicio.updateProducto(productoId, namePart, pricePart, descriptionPart, categoryPart, imgPart)
                 }
 
                 if (response.isSuccessful) {
-                    isSaveSuccessful = true
-                    isSaveRequested = false
+                    viewModel.refreshProducts()
                     navController.navigate("admProducts")
                 } else {
-                    Log.e("AddOrEditProductScreen", "Error en la respuesta de guardado.")
-                    isSaveRequested = false
+                    Log.e("AddOrEditProductScreen", "Error al guardar producto.")
                 }
             } catch (e: Exception) {
-                Log.e("AddOrEditProductScreen", "Error al guardar producto: ${e.message}")
+                Log.e("AddOrEditProductScreen", "Error: ${e.message}")
+            } finally {
                 isSaveRequested = false
             }
         }
     }
+
 
     // Layout principal
     LazyColumn(
@@ -217,9 +234,32 @@ fun AddOrEditProductScreen(
         }
 
         // Botón para subir imagen
+
         item {
-            Button(onClick = { imageLauncher.launch("image/*") }) {
-                Text("Seleccionar Imagen")
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            )  {
+                Button(onClick = { imageLauncher.launch("image/*") }) {
+                    Text("Seleccionar Imagen")
+                }
+                if (imgUri != null) {
+                    Image(
+                        painter = rememberAsyncImagePainter(imgUri),
+                        contentDescription = "Nueva imagen seleccionada",
+                        modifier = Modifier.size(200.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                    )
+                } else if (existingImgUrl != null) {
+                    Image(
+                        painter = rememberAsyncImagePainter(existingImgUrl),
+                        contentDescription = "Imagen existente",
+                        modifier = Modifier.size(200.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                    )
+                }
+
             }
         }
 

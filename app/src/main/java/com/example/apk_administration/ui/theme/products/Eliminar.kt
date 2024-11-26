@@ -14,12 +14,13 @@ import androidx.navigation.NavHostController
 @Composable
 fun ContenidoProductoEliminar(navController: NavHostController, servicio: ProductoApiService, id: Int) {
     var confirmDelete by remember { mutableStateOf(false) }
-
+    var viewModel = ProductViewModel(servicio)
     if (confirmDelete) {
         LaunchedEffect(Unit) {
             // Llamamos al nuevo método deleteProducto de ProductoApiServiceC
             val response = servicio.deleteProducto(id.toInt())
             if (response.isSuccessful) {
+                viewModel.refreshProducts()
                 navController.navigate("admProducts") // Navegamos de vuelta a la lista de productos tras el borrado
             } else {
                 // Manejar error si es necesario

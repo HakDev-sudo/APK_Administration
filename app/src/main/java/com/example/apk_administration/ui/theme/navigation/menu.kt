@@ -39,7 +39,6 @@ import com.example.apk_administration.ui.theme.account.AuthNavHost
 import com.example.apk_administration.ui.theme.home.HomeScreen
 import com.example.apk_administration.ui.theme.products.ProductViewModel
 import com.example.apk_administration.ui.theme.products.ProductoApiService
-import com.example.apk_administration.ui.theme.products.ProductoApiServiceC
 import com.example.apk_administration.ui.theme.stock.StockMovementApiService
 import com.example.apk_administration.ui.theme.stock.StockMovementViewModel
 import kotlinx.coroutines.launch
@@ -58,7 +57,7 @@ fun AlmacenApp() {
     // Crear instancias de los servicios API
     val nfcApiService = retrofit.create(NfcApiService::class.java)
     val categoryApiService = retrofit.create(CategoryApiService::class.java)
-    val productoApiServiceC = retrofit.create(ProductoApiServiceC::class.java)
+
 
     // Inicializar el NavController
     val navController = rememberNavController()
@@ -72,7 +71,6 @@ fun AlmacenApp() {
         navController = navController,
         nfcApiService = nfcApiService,
         categoryApiService = categoryApiService,
-        productoApiServiceC = productoApiServiceC,
         productViewModel = productViewModel,
         productoApiService = productoApiService,
         stockMovementViewModel = stockMovementViewModel
@@ -86,7 +84,6 @@ fun CustomScaffold(
     navController: NavHostController = rememberNavController(),
     nfcApiService: NfcApiService,
     categoryApiService: CategoryApiService,
-    productoApiServiceC: ProductoApiServiceC,
     productViewModel: ProductViewModel,
     productoApiService: ProductoApiService,
     stockMovementViewModel: StockMovementViewModel
@@ -124,7 +121,6 @@ fun CustomScaffold(
                             padding = PaddingValues(0.dp),
                             nfcApiService = nfcApiService,
                             categoryApiService = categoryApiService,
-                            productoApiServiceC = productoApiServiceC,
                             activity = navController.context as Activity,
                             productViewModel = productViewModel,
                             productoApiService = productoApiService,
