@@ -53,20 +53,14 @@ import kotlinx.coroutines.Dispatchers
 import java.io.InputStream
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.RequestBody
 
-private fun convertUriToBase64(uri: Uri, context: Context): String? {
-    return try {
-        val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
-        val bytes: ByteArray? = inputStream?.readBytes()
-        // Si bytes es nulo, retorna nulo
-        bytes ?: return null
-        // Codifica bytes a Base64
-        Base64.encodeToString(bytes, Base64.NO_WRAP)
-    } catch (e: Exception) {
-        Log.e("ImageConversion", "Error al convertir URI a base64: ${e.message}")
-        null
-    }
-}
+
+fun String.toRequestBody(mediaType: String): RequestBody =
+    this.toRequestBody(mediaType.toMediaType())
 
 @Composable
 fun AddOrEditProductScreen(
@@ -110,39 +104,38 @@ fun AddOrEditProductScreen(
     LaunchedEffect(isSaveRequested) {
         if (isSaveRequested) {
             try {
-                val imageBase64 = imgUri?.let { convertUriToBase64(it, context) }
-                val newProduct = ProductModel(
-                    id = productoId,
-                    name = name,
-                    img = imageBase64,
-                    price = price.toDoubleOrNull() ?: 0.0,
-                    description = description,
-                    category = categoryId.toIntOrNull() ?: 0
-                )
+                val namePart = name.toRequestBody("text/plain".toMediaType())
+                val pricePart = price.toRequestBody("text/plain".toMediaType())
+                val descriptionPart = description.toRequestBody("text/plain".toMediaType())
+                val categoryPart = categoryId.toRequestBody("text/plain".toMediaType())
+
+                val imgPart = imgUri?.let {
+                    val inputStream = context.contentResolver.openInputStream(it)
+                    val bytes = inputStream?.readBytes()
+                    val requestBody = bytes?.toRequestBody("image/*".toMediaType())
+                    requestBody?.let { body -> MultipartBody.Part.createFormData("img", "image.jpg", body) }
+                }
 
                 val response = if (productoId == 0) {
-                    servicio.insertProducto(newProduct)
+                    servicio.insertProducto(namePart, pricePart, descriptionPart, categoryPart, imgPart)
                 } else {
-                    servicio.updateProducto(productoId, newProduct)
+                    servicio.updateProducto(productoId, namePart, pricePart, descriptionPart, categoryPart, imgPart)
                 }
 
                 if (response.isSuccessful) {
-                    isSaveRequested = false // Evita re-renderizados innecesarios
-                    isSaveSuccessful = true // Actualiza el estado de éxito
+                    isSaveSuccessful = true
+                    isSaveRequested = false
+                    navController.navigate("admProducts")
                 } else {
                     Log.e("AddOrEditProductScreen", "Error en la respuesta de guardado.")
-                    isSaveRequested = false // Reinicia en caso de error
+                    isSaveRequested = false
                 }
             } catch (e: Exception) {
-                Log.e("AddOrEditProductScreen", "Error al guardar o actualizar el producto: ${e.message}")
-                isSaveRequested = false // Reinicia en caso de error
+                Log.e("AddOrEditProductScreen", "Error al guardar producto: ${e.message}")
+                isSaveRequested = false
             }
-            navController.navigate("admProducts")
         }
-
     }
-
-
 
     // Layout principal
     LazyColumn(

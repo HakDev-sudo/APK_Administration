@@ -1,6 +1,7 @@
 package com.example.apk_administration.ui.theme.products
 
 import com.google.gson.annotations.SerializedName
+import okhttp3.MultipartBody
 
 data class ProductModel(
     @SerializedName("id")
@@ -18,4 +19,4 @@ data class ProductModel(
     @SerializedName("category")
     val category: Int,
 
-)
+    )
