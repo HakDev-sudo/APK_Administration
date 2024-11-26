@@ -1,8 +1,20 @@
 package com.example.apk_administration.ui.theme.Category
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.OptIn
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -15,97 +27,188 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
+import com.example.apk_administration.ui.theme.products.ProductViewModel
+import com.example.apk_administration.ui.theme.products.ProductoApiService
+import com.example.apk_administration.ui.theme.products.toRequestBody
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.ui.platform.LocalContext
+import androidx.media3.common.util.Log
+import androidx.media3.common.util.UnstableApi
+import coil.compose.rememberImagePainter
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 
+
+@OptIn(UnstableApi::class)
 @Composable
 fun ContenidoCategoryEditar(
     navController: NavHostController,
     servicio: CategoryApiService,
+    productoApiService: ProductoApiService,
     categoryId: Int = 0
 ) {
-    var id by remember { mutableStateOf(categoryId) }
-    var name by remember { mutableStateOf("") }
-    var img by remember { mutableStateOf<String?>(null) } // img puede ser null por defecto
-    var grabar by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(id != 0) }
-    var isProcessing by remember { mutableStateOf(false) } // Estado para bloquear el botón mientras se procesa la solicitud
+    val context = LocalContext.current
 
-    // Cargar los datos de la categoría si es edición
-    LaunchedEffect(id) {
-        if (id != 0) {
-            val response = servicio.selectCategory(id.toString())
+    // Estados para los campos
+    var name by remember { mutableStateOf("") }
+    var imgUri by remember { mutableStateOf<Uri?>(null) }
+    var existingImgUrl by remember { mutableStateOf<String?>(null) }
+    var isSaveRequested by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(categoryId != 0) }
+    var isProcessing by remember { mutableStateOf(false) }
+
+    // Lector de imágenes
+    val imageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        imgUri = uri
+    }
+
+    // Cargar datos si es edición
+    LaunchedEffect(Unit) {
+        if (categoryId != 0) {
+            val response = servicio.selectCategory(categoryId.toString())
             if (response.isSuccessful) {
-                val objCategory = response.body()
-                objCategory?.let {
+                response.body()?.let {
                     name = it.name
-                    img = it.img // img puede ser null
+                    existingImgUrl = it.img
                 }
             }
-            isLoading = false // Ya se cargaron los datos
+            isLoading = false
+        } else {
+            isLoading = false
         }
     }
 
-    Column(
+    // Manejar la lógica de guardado
+    LaunchedEffect(isSaveRequested) {
+        if (isSaveRequested) {
+            try {
+                val namePart = name.toRequestBody("text/plain".toMediaType())
+
+                val imgPart = when {
+                    imgUri != null -> {
+                        val inputStream = context.contentResolver.openInputStream(imgUri!!)
+                        val bytes = inputStream?.readBytes()
+                        val requestBody = bytes?.toRequestBody("image/*".toMediaType())
+                        MultipartBody.Part.createFormData("img", "image.jpg", requestBody!!)
+                    }
+                    existingImgUrl != null -> {
+                        val requestBody = existingImgUrl!!.toRequestBody("text/plain".toMediaType())
+                        MultipartBody.Part.createFormData("existingImg", "image.jpg", requestBody)
+                    }
+                    else -> null
+                }
+
+                val response = if (categoryId == 0) {
+                    servicio.insertCategory(namePart, "".toRequestBody("text/plain".toMediaType()), imgPart)
+                } else {
+                    servicio.updateCategory(categoryId.toString(), namePart, "".toRequestBody("text/plain".toMediaType()), imgPart)
+                }
+
+                if (response.isSuccessful) {
+                    navController.navigate("categoryList") {
+                        popUpTo("categoryList") { inclusive = true }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("AddOrEditCategoryScreen", "Error: ${e.message}")
+            } finally {
+                isSaveRequested = false
+                isProcessing = false
+            }
+        }
+    }
+
+    // Layout
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // Mostrar los TextField solo cuando no está cargando
-        if (!isLoading) {
-            TextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("Nombre de la Categoría") },
-                singleLine = true
-            )
-            TextField(
-                value = img ?: "", // Muestra un campo vacío si img es null
-                onValueChange = { img = if (it.isEmpty()) null else it }, // Asigna null si el campo está vacío
-                label = { Text("URL de Imagen (opcional)") },
-                singleLine = true
-            )
-            Button(
-                onClick = { grabar = true }, // Al hacer clic, cambiar grabar a true
-                modifier = Modifier.padding(top = 16.dp),
-                enabled = !isProcessing // Deshabilitar mientras está procesando
-            ) {
-                Text("Guardar", fontSize = 16.sp)
+        if (isLoading) {
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
             }
         } else {
-            // Mostrar un indicador de carga mientras se obtienen los datos
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-        }
-    }
-
-    // Guardar la categoría (inserción o actualización)
-    if (grabar) {
-        // Asegúrate de que el modelo se crea correctamente
-        val objCategory = CategoryModel(id, name, img)
-
-        // Bloquear el botón durante el procesamiento
-        isProcessing = true
-
-        LaunchedEffect(grabar) {
-            val response = if (id == 0) {
-                servicio.insertCategory(objCategory.copy(id = 0)) // id se envía como 0 para nuevas inserciones
-            } else {
-                servicio.updateCategory(id.toString(), objCategory)
+            // Campo de nombre
+            item {
+                TextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Nombre de la Categoría") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(16.dp))
             }
 
-            if (response.isSuccessful) {
-                // Redirigir a la pantalla de categorías después de guardar
-                navController.navigate("categoryList") {
-                    popUpTo("categoryList") { inclusive = true }
+            // Subir imagen
+            item {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Button(onClick = { imageLauncher.launch("image/*") }) {
+                        Text("Seleccionar Imagen")
+                    }
+                    if (imgUri != null) {
+                        Image(
+                            painter = rememberAsyncImagePainter(imgUri),
+                            contentDescription = "Nueva imagen seleccionada",
+                            modifier = Modifier
+                                .size(200.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                        )
+                    } else if (existingImgUrl != null) {
+                        Image(
+                            painter = rememberAsyncImagePainter(existingImgUrl),
+                            contentDescription = "Imagen existente",
+                            modifier = Modifier
+                                .size(200.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                        )
+                    }
                 }
-            } else {
-                // Aquí puedes manejar el error
+                Spacer(modifier = Modifier.height(16.dp))
             }
 
-            // Reiniciar el estado de grabar e isProcessing
-            grabar = false
-            isProcessing = false
+            // Botón Guardar
+            item {
+                Button(
+                    onClick = {
+                        if (name.isNotEmpty()) {
+                            isSaveRequested = true
+                            isProcessing = true
+                        } else {
+                            Log.e("AddOrEditCategoryScreen", "Campos obligatorios faltantes.")
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !isProcessing
+                ) {
+                    Text(if (categoryId == 0) "Guardar Categoría" else "Actualizar Categoría")
+                }
+            }
         }
     }
 }
+
