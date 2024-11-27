@@ -1,6 +1,7 @@
 package com.example.apk_administration.ui.theme.NFC
 
 import android.app.Activity
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -38,8 +39,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.apk_administration.ui.theme.products.ProductModel
 import com.example.apk_administration.ui.theme.products.ProductViewModel
-import com.example.apk_administration.ui.theme.products.ProductoApiServiceC
-import com.example.apk_administration.ui.theme.products.ProductoModelGet
 import com.example.apk_administration.ui.theme.stock.StockMovementViewModel
 import kotlinx.coroutines.launch
 
@@ -54,6 +53,7 @@ fun ProductNFCReader(
 
     LaunchedEffect(Unit) {
         viewModel.refreshProducts()
+        viewModel.refreshNfcs()
     }
     // Inicializa NFCManager y estados
     val nfcManager = remember { NFCManager(activity, apiService) }
@@ -102,7 +102,11 @@ fun ProductNFCReaderScreen(
 
     // Estado para el monto total de los productos escaneados
     var totalAmount by remember { mutableStateOf(0.0) }
-
+    // Actualizar datos al cargar la pantalla
+    LaunchedEffect(Unit) {
+        viewModel.refreshProducts()
+        viewModel.refreshNfcs()
+    }
     // Lógica para activar y desactivar el modo de lector NFC
     LaunchedEffect(isReaderActive) {
         if (isReaderActive) {
@@ -110,6 +114,10 @@ fun ProductNFCReaderScreen(
         } else {
             onDeactivateReader()
         }
+    }
+    LaunchedEffect(productList) {
+        // Lógica para procesar productos actualizados, si aplica
+        Log.d("ProductNFCReaderScreen", "Lista de productos actualizada: ${productList.size}")
     }
 
     // Efecto para procesar cada nueva lectura NFC
@@ -259,6 +267,3 @@ fun ProductNFCReaderScreen(
         }
     }
 }
-
-
-

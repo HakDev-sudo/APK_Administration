@@ -18,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.Dialog
 import com.example.apk_administration.ui.theme.products.ProductModel
+import com.example.apk_administration.ui.theme.products.ProductViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -27,13 +28,18 @@ import java.time.LocalDate
 fun NFCReaderScreen(
     activity: Activity,
     apiService: NfcApiService,
-    products: List<ProductModel>) {
+    viewModel: ProductViewModel
+) {
     // Inicializa NFCManager y los estados necesarios
     val nfcManager = remember { NFCManager(activity, apiService) }
     val isNFCEnabled = remember { mutableStateOf(nfcManager.isNFCEnabled()) }
     val isReaderActive = remember { mutableStateOf(false) }
-
+    val products by viewModel.productList.collectAsState()
     // Pasa los parámetros y funciones de activación/desactivación de lector al segundo NFCReaderScreen
+    LaunchedEffect(Unit) {
+        viewModel.loadProducts()
+    }
+
     NFCReaderScreen(
         nfcManager = nfcManager,
         isNFCEnabled = isNFCEnabled.value,
@@ -52,7 +58,8 @@ fun NFCReaderScreen(
         onUpdateNFCStatus = { isEnabled ->
             isNFCEnabled.value = isEnabled
         },
-        products = products
+        products = products,
+        viewModel = viewModel
     )
 }
 
@@ -66,7 +73,8 @@ fun NFCReaderScreen(
     onDeactivateReader: () -> Unit,
     onClearNFCId: () -> Unit, // Nueva función para limpiar el ID después de la lectura
     onUpdateNFCStatus: (Boolean) -> Unit,
-    products: List<ProductModel>
+    products: List<ProductModel>,
+    viewModel: ProductViewModel
 ) {
     val nfcId by nfcManager.nfcId.collectAsState()
     var showLoadingDialog by remember { mutableStateOf(false) }
@@ -125,6 +133,8 @@ fun NFCReaderScreen(
             val response = nfcManager.apiService.insertNfc(newNfc)
 
             if (response.isSuccessful) {
+                viewModel.loadProducts()
+                viewModel.refreshNfcs()
                 showConfirmationDialog = false
                 onClearNFCId()
                 snackbarHostState.showSnackbar("Tarjeta registrada con éxito")

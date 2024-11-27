@@ -17,7 +17,7 @@ interface CategoryApiService {
     @GET("api/categorias")
     suspend fun selectCategories(): List<CategoryModel>
 
-    @GET("pi/categoria/{id}")
+    @GET("api/categoria/{id}")
     suspend fun selectCategory(@Path("id") id: String): Response<CategoryModel>
 
     @Multipart

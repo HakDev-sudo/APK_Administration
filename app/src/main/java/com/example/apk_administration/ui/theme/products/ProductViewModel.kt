@@ -29,7 +29,7 @@ class ProductViewModel(private val apiService: ProductoApiService) : ViewModel()
         loadNfcs()
     }
 
-    private fun loadProducts() {
+    public fun loadProducts() {
         viewModelScope.launch {
             try {
                 val products = apiService.selectProductos() // Obtiene todos los productos de la API

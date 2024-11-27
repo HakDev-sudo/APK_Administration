@@ -31,8 +31,8 @@ fun NFCTopBar(navController: NavHostController) {
     TopAppBar(
         title = { Text("Administrar NFC", fontSize = 20.sp, fontWeight = FontWeight.Bold) },
         actions = {
-            IconButton(onClick = { navController.navigate("nfc_reader") }) {
-                Icon(Icons.Default.Add, contentDescription = "Agregar NFC")
+            IconButton(onClick = {  }) {
+                Icon(Icons.Default.Add, contentDescription = "Listado  NFC")
             }
             IconButton(onClick = { /* Acción para filtrar registros NFC */ }) {
                 Icon(Icons.Default.FilterList, contentDescription = "Filtrar NFC")
@@ -84,7 +84,7 @@ fun NFCWindow(padding: PaddingValues, navController: NavHostController) {
             ) {
                 // Botón de "Registro de Entrada"
                 Button(
-                    onClick = { navController.navigate("nfc_producto") },
+                    onClick = { navController.navigate("nfc_reader") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 32.dp, vertical = 8.dp)
@@ -101,7 +101,7 @@ fun NFCWindow(padding: PaddingValues, navController: NavHostController) {
 
                 // Botón de "Registro de Salida"
                 Button(
-                    onClick = { /* Acción de registrar salida */ },
+                    onClick = { navController.navigate("nfc_producto") },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                     modifier = Modifier
                         .fillMaxWidth()
