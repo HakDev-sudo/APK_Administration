@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.apk_administration.ui.theme.products.ProductModel
 import com.example.apk_administration.ui.theme.products.ProductViewModel
 import com.example.apk_administration.ui.theme.stock.StockMovementViewModel
@@ -48,7 +49,8 @@ fun ProductNFCReader(
     activity: Activity,
     viewModel: ProductViewModel,
     apiService: NfcApiService,
-    stockMovementViewModel: StockMovementViewModel
+    stockMovementViewModel: StockMovementViewModel,
+    navController: NavHostController
 ) {
 
     LaunchedEffect(Unit) {
@@ -77,7 +79,8 @@ fun ProductNFCReader(
         onClearNFCId = {
             nfcManager.clearNFCId()
         },
-        stockMovementViewModel = stockMovementViewModel
+        stockMovementViewModel = stockMovementViewModel,
+        navController = navController
     )
 }
 
@@ -91,6 +94,7 @@ fun ProductNFCReaderScreen(
     onDeactivateReader: () -> Unit,
     onClearNFCId: () -> Unit,
     stockMovementViewModel: StockMovementViewModel,
+    navController: NavHostController
 ) {
     val nfcId by nfcManager.nfcId.collectAsState()
     val productList by viewModel.productList.collectAsState()
@@ -102,6 +106,13 @@ fun ProductNFCReaderScreen(
 
     // Estado para el monto total de los productos escaneados
     var totalAmount by remember { mutableStateOf(0.0) }
+    // Mantener la lista NFC local y sincronizada
+    var currentNfcList by remember { mutableStateOf<List<NfcModel>>(emptyList()) }
+    // Actualiza la lista local cuando nfcList cambia
+    LaunchedEffect(viewModel.nfcList) {
+        currentNfcList = viewModel.nfcList.value
+    }
+
     // Actualizar datos al cargar la pantalla
     LaunchedEffect(Unit) {
         viewModel.refreshProducts()
@@ -122,12 +133,13 @@ fun ProductNFCReaderScreen(
 
     // Efecto para procesar cada nueva lectura NFC
     LaunchedEffect(nfcId) {
-        if (nfcList.isEmpty()) {
-            snackbarHostState.showSnackbar("No se han cargado las etiquetas NFC")
-            return@LaunchedEffect
-        }
+
 
         nfcId?.let { idTag ->
+            if (nfcList.isEmpty()) {
+                snackbarHostState.showSnackbar("No se han cargado las etiquetas NFC")
+                return@LaunchedEffect
+            }
             if (scannedNfcTags.contains(idTag)) {
                 snackbarHostState.showSnackbar("Etiqueta NFC ya registrada")
             } else {
@@ -260,6 +272,9 @@ fun ProductNFCReaderScreen(
                 scannedProducts.clear()
                 scannedNfcTags.clear()
                 totalAmount = 0.0
+                viewModel.refreshNfcs()
+                navController.navigate("nfc")
+
             },
             modifier = Modifier.padding(16.dp)
         ) {

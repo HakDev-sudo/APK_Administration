@@ -41,6 +41,7 @@ import com.example.apk_administration.ui.theme.products.ProductViewModel
 import com.example.apk_administration.ui.theme.products.ProductoApiService
 import com.example.apk_administration.ui.theme.stock.StockMovementApiService
 import com.example.apk_administration.ui.theme.stock.StockMovementViewModel
+import com.google.gson.GsonBuilder
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -51,8 +52,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 fun AlmacenApp() {
     // Configuración de Retrofit y creación de servicios API
     val urlBase = "http://192.168.18.33:8000/" // o tu IP si usarás un dispositivo externo
+    val gson = GsonBuilder().serializeNulls().create()
     val retrofit = Retrofit.Builder().baseUrl(urlBase)
-        .addConverterFactory(GsonConverterFactory.create()).build()
+        .addConverterFactory(GsonConverterFactory.create(gson)).build()
 
     // Crear instancias de los servicios API
     val nfcApiService = retrofit.create(NfcApiService::class.java)

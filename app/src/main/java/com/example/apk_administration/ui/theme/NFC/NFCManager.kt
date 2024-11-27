@@ -80,4 +80,22 @@ class NFCManager(private val activity: Activity, val apiService: NfcApiService) 
         }
     }
 
+    // Nueva función para verificar si el NFC está registrado y si tiene el campo product vacío
+    suspend fun isReusableNFC(idTag: String): Pair<Boolean, Boolean> {
+        return try {
+            val nfcList = apiService.selectNfcs() // Llama a la API para obtener todas las etiquetas
+            val matchingTag = nfcList.find { it.idTag == idTag } // Busca la etiqueta por idTag
+            if (matchingTag != null) {
+                // Retorna true si la etiqueta existe y si el campo product es null
+                Pair(true, matchingTag.product == null)
+            } else {
+                // Si no existe, retorna false
+                Pair(false, false)
+            }
+        } catch (e: Exception) {
+            Pair(false, false) // Retorna falso si ocurre un error
+        }
+    }
+
+
 }

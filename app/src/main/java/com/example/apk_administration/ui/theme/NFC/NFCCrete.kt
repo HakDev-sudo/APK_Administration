@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.Dialog
 import com.example.apk_administration.ui.theme.products.ProductModel
 import com.example.apk_administration.ui.theme.products.ProductViewModel
+import com.example.apk_administration.ui.theme.stock.StockMovementViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -28,7 +29,8 @@ import java.time.LocalDate
 fun NFCReaderScreen(
     activity: Activity,
     apiService: NfcApiService,
-    viewModel: ProductViewModel
+    viewModel: ProductViewModel,
+    stockViewModel: StockMovementViewModel
 ) {
     // Inicializa NFCManager y los estados necesarios
     val nfcManager = remember { NFCManager(activity, apiService) }
@@ -59,7 +61,8 @@ fun NFCReaderScreen(
             isNFCEnabled.value = isEnabled
         },
         products = products,
-        viewModel = viewModel
+        viewModel = viewModel,
+        stockViewModel
     )
 }
 
@@ -74,7 +77,8 @@ fun NFCReaderScreen(
     onClearNFCId: () -> Unit, // Nueva función para limpiar el ID después de la lectura
     onUpdateNFCStatus: (Boolean) -> Unit,
     products: List<ProductModel>,
-    viewModel: ProductViewModel
+    viewModel: ProductViewModel,
+    stockViewModel: StockMovementViewModel
 ) {
     val nfcId by nfcManager.nfcId.collectAsState()
     var showLoadingDialog by remember { mutableStateOf(false) }
@@ -102,12 +106,14 @@ fun NFCReaderScreen(
     // Función para verificar y registrar el NFC
     fun checkAndRegisterNFC() {
         coroutineScope.launch {
+            val (exists, isReusable) = nfcManager.isReusableNFC(nfcId ?: "") // Verificar si existe y es reutilizable
 
-            val exists = nfcManager.checkIfNFCExists(nfcId ?: "") // Verificar si el id_tag ya existe
-
-            if (exists) {
-                // Mostrar Snackbar si la tarjeta ya está registrada
-                snackbarHostState.showSnackbar("Tarjeta ya registrada")
+            if (exists && isReusable) {
+                // Mostrar Dialog para confirmar el registro si la tarjeta es reutilizable
+                showConfirmationDialog = true
+            } else if (exists) {
+                // Mostrar Snackbar si la tarjeta ya está registrada y no es reutilizable
+                snackbarHostState.showSnackbar("Tarjeta ya registrada y no reutilizable")
                 showConfirmationDialog = false
 
             } else {
@@ -116,6 +122,7 @@ fun NFCReaderScreen(
             }
         }
     }
+
 
     // Función para registrar el NFC
     fun registerNFC(selectedProduct: ProductModel?) {

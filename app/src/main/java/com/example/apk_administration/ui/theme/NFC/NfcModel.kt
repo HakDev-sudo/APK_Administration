@@ -1,5 +1,6 @@
 package com.example.apk_administration.ui.theme.NFC
 
+import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 data class NfcModel (
@@ -12,5 +13,6 @@ data class NfcModel (
     @SerializedName("fecha_asignado")
     private var fechaAsignado: String,
     @SerializedName("product")
-    var product: Int? // Representa el ID del producto asociado, puede ser null si no está asignado
+    @Expose
+    var product: Int?=null // Representa el ID del producto asociado, puede ser null si no está asignado
 )

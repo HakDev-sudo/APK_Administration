@@ -121,9 +121,9 @@ fun NavigationHost(
         //Pantallas NFC
         composable("nfc_reader") {
             val products = productViewModel.productList.collectAsState().value
-            NFCReaderScreen(activity, nfcApiService, productViewModel ) }
+            NFCReaderScreen(activity, nfcApiService, productViewModel, stockMovementViewModel ) }
         composable("nfc_producto") {
-            ProductNFCReader(activity, productViewModel, nfcApiService, stockMovementViewModel)
+            ProductNFCReader(activity, productViewModel, nfcApiService, stockMovementViewModel, navController)
         }
     }
 }
