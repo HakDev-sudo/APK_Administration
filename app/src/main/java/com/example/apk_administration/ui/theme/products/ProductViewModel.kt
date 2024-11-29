@@ -77,4 +77,8 @@ class ProductViewModel(private val apiService: ProductoApiService) : ViewModel()
     fun refreshNfcs() {
         loadNfcs() // Vuelve a cargar las etiquetas NFC desde la API
     }
+    fun getNfcTagsByProduct(productId: Int): List<NfcModel> {
+        return _nfcList.value.filter { it.product == productId }
+    }
+
 }

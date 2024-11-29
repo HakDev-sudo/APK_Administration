@@ -97,9 +97,9 @@ fun NavigationHost(
             ContenidoProductoEliminar(navController, productoApiService, it.arguments!!.getInt("id"))
         }
         composable("productoVer/{id}", arguments = listOf(
-            navArgument("id") { type = NavType.StringType })
+            navArgument("id") { type = NavType.IntType })
         ) {
-            ProductoDetailScreen(productId = it.arguments!!.getInt("id"), navController, productoApiService)
+            ProductoDetailScreen(productId = it.arguments!!.getInt("id"), navController = navController, productoApiService, nfcApiService)
         }
 
 

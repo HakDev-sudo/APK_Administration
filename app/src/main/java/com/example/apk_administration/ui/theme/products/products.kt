@@ -3,6 +3,7 @@ package com.example.apk_administration.ui.theme.products
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -34,6 +35,7 @@ import androidx.navigation.NavHostController
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
@@ -68,8 +70,13 @@ fun ProductCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable {
-                navController.navigate("productoVer/${product.id}")
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = {
+                        // Navega a la pantalla de detalles del producto al presionar prolongadamente
+                        navController.navigate("productoVer/${product.id}")
+                    }
+                )
             }
     ) {
         Row(
