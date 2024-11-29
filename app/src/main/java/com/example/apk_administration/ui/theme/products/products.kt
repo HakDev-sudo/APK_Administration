@@ -32,21 +32,24 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
+import kotlinx.coroutines.launch
 
 // Barra superior con botones de agregar y filtro
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProductManagementTopBar(navController: NavHostController) {
+fun ProductManagementTopBar(navController: NavHostController, onFilterClick: () -> Unit) {
+    var showFilterSheet by remember { mutableStateOf(false) }
     TopAppBar(
         title = { Text("Administrar Productos", fontSize = 20.sp, fontWeight = FontWeight.Bold) },
         actions = {
             IconButton(onClick = { navController.navigate("AddProduct") }) {
                 Icon(Icons.Default.Add, contentDescription = "Agregar Producto")
             }
-            IconButton(onClick = { /* Acción para filtrar productos */ }) {
+            IconButton(onClick = { onFilterClick() }) {
                 Icon(Icons.Default.FilterList, contentDescription = "Filtrar Productos")
             }
         }
@@ -153,14 +156,19 @@ fun ProductList(
 }
 
 // Pantalla completa de administración de productos
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductManagementScreen(servicio: ProductoApiService, navController: NavHostController) {
     var productos by remember { mutableStateOf(emptyList<ProductModel>()) }
     var categorias by remember { mutableStateOf(mapOf<Int, String>()) }
     var nfcs by remember { mutableStateOf(mapOf<Int, String>()) }
-
+    var selectedCategory by remember { mutableStateOf<Int?>(null) }
+    var showFilterSheet by remember { mutableStateOf(false)}
+    val scope = rememberCoroutineScope()
+    var allProductos by remember { mutableStateOf(emptyList<ProductModel>()) }
     LaunchedEffect(Unit) {
-        productos = servicio.selectProductos()
+        allProductos = servicio.selectProductos()
+        productos = allProductos
 
         // Cargar categorías y NFCs
         categorias = servicio.selectCategories().associate { it.id to it.name }
@@ -171,7 +179,46 @@ fun ProductManagementScreen(servicio: ProductoApiService, navController: NavHost
         modifier = Modifier.fillMaxSize()
     ) {
         // Barra superior
-        ProductManagementTopBar(navController = navController)
+        ProductManagementTopBar(navController = navController,onFilterClick = { showFilterSheet = true })
+        // Mostrar el filtro en un ModalBottomSheet
+        if (showFilterSheet) {
+            ModalBottomSheet(
+                onDismissRequest = { showFilterSheet = false }
+            ) {
+                CategoryFilterSheet(
+                    categories = categorias,
+                    selectedCategory = selectedCategory,
+                    onCategorySelected = { selectedCategory = it },
+                    onApplyFilter = {
+                        scope.launch {
+                            showFilterSheet = false
+                            productos = if (selectedCategory != null) {
+                                // Filtrar productos por la categoría seleccionada
+                                allProductos.filter { it.category == selectedCategory }
+                            } else {
+                                // Resetear a todos los productos si no hay categoría seleccionada
+                                allProductos
+                            }
+                        }
+                    }
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+
+                // Botón "Quitar Filtros"
+                Button(
+                    onClick = {
+                        selectedCategory = null // Restablecer la categoría seleccionada
+                        productos = allProductos // Mostrar todos los productos
+                        showFilterSheet = false // Cerrar el modal
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp)
+                ) {
+                    Text("Quitar Filtros")
+                }
+            }
+        }
 
         // Lista de productos
         ProductList(
@@ -182,7 +229,3 @@ fun ProductManagementScreen(servicio: ProductoApiService, navController: NavHost
         )
     }
 }
-
-
-
-
