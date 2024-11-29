@@ -11,7 +11,7 @@ data class NfcModel (
     @SerializedName("status")
     var status: String,
     @SerializedName("fecha_asignado")
-    private var fechaAsignado: String,
+    var fechaAsignado: String,
     @SerializedName("product")
     @Expose
     var product: Int?=null // Representa el ID del producto asociado, puede ser null si no está asignado

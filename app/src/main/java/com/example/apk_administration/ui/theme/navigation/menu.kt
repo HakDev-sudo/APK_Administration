@@ -66,7 +66,7 @@ fun AlmacenApp() {
     val productoApiService = retrofit.create(ProductoApiService::class.java)
     val productViewModel = ProductViewModel(productoApiService)
     val stockMovementApiService = retrofit.create(StockMovementApiService::class.java)
-    val stockMovementViewModel = StockMovementViewModel(stockMovementApiService, nfcApiService)
+    val stockMovementViewModel = StockMovementViewModel(stockMovementApiService, nfcApiService, productViewModel)
 
     // Llamar al CustomScaffold y pasar los servicios API como parámetros
     CustomScaffold(

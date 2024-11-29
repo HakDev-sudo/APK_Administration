@@ -83,9 +83,14 @@ fun NFCReaderScreen(
     val nfcId by nfcManager.nfcId.collectAsState()
     var showLoadingDialog by remember { mutableStateOf(false) }
     var showConfirmationDialog by remember { mutableStateOf(false) }
+    var showUpdateDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     var snackbarHostState = remember { SnackbarHostState() }
     val fechaDeHoy: LocalDate = LocalDate.now()
+    var nfcTagId by remember { mutableStateOf<Int?>(null) }
+    // Estado para controlar la visibilidad del mensaje
+    var showSuccessMessage by remember { mutableStateOf(false) }
+    var successMessage by remember { mutableStateOf("") }
 
     // Función para sincronizar NFC de forma asincrónica
     fun synchronizeNFC() {
@@ -103,6 +108,17 @@ fun NFCReaderScreen(
         }
     }
 
+    // Función para obtener el ID del NFC basado en el idTag
+    fun fetchNfcTagId() {
+        coroutineScope.launch {
+            nfcId?.let { idTag ->
+                nfcTagId = nfcManager.getNfcIdByIdTag(idTag) // Llama a la función del manager
+                showLoadingDialog = false
+
+            }
+        }
+    }
+
     // Función para verificar y registrar el NFC
     fun checkAndRegisterNFC() {
         coroutineScope.launch {
@@ -110,7 +126,7 @@ fun NFCReaderScreen(
 
             if (exists && isReusable) {
                 // Mostrar Dialog para confirmar el registro si la tarjeta es reutilizable
-                showConfirmationDialog = true
+                showUpdateDialog = true
             } else if (exists) {
                 // Mostrar Snackbar si la tarjeta ya está registrada y no es reutilizable
                 snackbarHostState.showSnackbar("Tarjeta ya registrada y no reutilizable")
@@ -265,6 +281,27 @@ fun NFCReaderScreen(
             onCancel = {
                 onClearNFCId()
                 showConfirmationDialog = false }
+        )
+    }
+    if (showUpdateDialog && nfcId != null) {
+        fetchNfcTagId()
+        UpdateNFCDialog(
+            nfcId = nfcId,
+            products = products,
+            onConfirm = { selectedProduct, quantity, description ->
+                if (selectedProduct != null && nfcTagId != null) {
+                    stockViewModel.registerProductWithNfc(
+                        productId = selectedProduct.id,
+                        nfcTagId = nfcTagId!!,
+                        quantity = quantity,
+                        description = description
+                    )
+                }
+            },
+            onCancel = {
+                onClearNFCId()
+                showUpdateDialog = false
+            }
         )
     }
 }

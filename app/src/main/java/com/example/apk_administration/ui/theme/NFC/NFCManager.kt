@@ -96,6 +96,20 @@ class NFCManager(private val activity: Activity, val apiService: NfcApiService) 
             Pair(false, false) // Retorna falso si ocurre un error
         }
     }
+    // Nueva función para obtener el ID de la etiqueta NFC basado en el idTag
+    suspend fun getNfcIdByIdTag(idTag: String): Int? {
+        return try {
+            // Llama a la API para obtener todas las etiquetas
+            val nfcList = apiService.selectNfcs()
+            // Busca la etiqueta que coincida con el idTag
+            val matchingTag = nfcList.find { it.idTag == idTag }
+            // Retorna el id de la etiqueta, o null si no se encuentra
+            matchingTag?.id
+        } catch (e: Exception) {
+            println("Error al buscar el ID por idTag: ${e.message}")
+            null // Retorna null si ocurre un error
+        }
+    }
 
 
 }

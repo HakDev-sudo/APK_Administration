@@ -34,6 +34,7 @@ import com.example.apk_administration.ui.theme.products.ProductoApiService
 import com.example.apk_administration.ui.theme.products.ProductoDetailScreen
 import com.example.apk_administration.ui.theme.registros.RegistroScreen
 import com.example.apk_administration.ui.theme.settings.SettingsScreenContent
+import com.example.apk_administration.ui.theme.stock.StockMovementForm
 import com.example.apk_administration.ui.theme.stock.StockMovementViewModel
 import com.example.apk_administration.ui.theme.user.PerfilScreen
 
@@ -54,7 +55,7 @@ fun NavigationHost(
 
         // Pantalla de Home
         composable("home") {
-            HomeScreen(padding, navController, productoApiService)
+            HomeScreen(padding, navController, productoApiService, categoryApiService)
 
         }
         composable("nfc") {
@@ -124,6 +125,10 @@ fun NavigationHost(
             NFCReaderScreen(activity, nfcApiService, productViewModel, stockMovementViewModel ) }
         composable("nfc_producto") {
             ProductNFCReader(activity, productViewModel, nfcApiService, stockMovementViewModel, navController)
+        }
+        //stock
+        composable("stock") {
+            StockMovementForm(stockMovementViewModel)
         }
     }
 }
