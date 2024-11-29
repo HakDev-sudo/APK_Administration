@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "com.example.apk_administration"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.apk_administration"
-        minSdk = 24
-        targetSdk = 34
+        minSdk = 25
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -40,7 +40,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.14"
     }
     packaging {
         resources {
@@ -64,6 +64,11 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.foundation.layout.android)
     implementation(libs.androidx.foundation.android)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.espresso.core)
+    implementation(libs.androidx.media3.common.ktx)
+    implementation(libs.androidx.compose.material)
+    implementation(libs.androidx.compose.material3)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -88,4 +93,16 @@ dependencies {
     implementation ("androidx.compose.ui:ui")
     implementation ("androidx.compose.material3:material3")
     implementation ("androidx.compose.ui:ui-tooling-preview")
+
+    // For AppWidgets support
+    implementation ("androidx.glance:glance-appwidget:1.1.0")
+
+    // For interop APIs with Material 3
+    implementation ("androidx.glance:glance-material3:1.1.0")
+
+    // For interop APIs with Material 2
+    implementation ("androidx.glance:glance-material:1.1.0")
+
+    implementation ("androidx.work:work-runtime-ktx:2.8.1")
+
 }

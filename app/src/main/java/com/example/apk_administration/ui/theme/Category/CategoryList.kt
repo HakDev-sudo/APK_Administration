@@ -2,6 +2,7 @@ package com.example.apk_administration.ui.theme.Category
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -77,12 +79,16 @@ fun CategoryListScreen(navController: NavHostController, servicio: CategoryApiSe
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp)
-                        .clickable {
-                            // Navegar a la vista de detalles al hacer clic en la tarjeta
-                            navController.navigate("categoriaVer/${categoria.id}")
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onLongPress = {
+                                    // Navegar a la vista de detalles al mantener presionado la tarjeta
+                                    navController.navigate("categoryDetails/${categoria.id}")
+                                }
+                            )
                         },
                     shape = RoundedCornerShape(8.dp),
-                    colors = CardDefaults.cardColors(Color(0xFFA49BEF)) // Diferente color para categorías
+                    colors = CardDefaults.cardColors(Color(0xFFD4CFF6)) // Diferente color para categorías
                 ) {
                     Row(
                         modifier = Modifier

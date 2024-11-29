@@ -2,6 +2,7 @@ package com.example.apk_administration.ui.theme.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -24,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import com.example.apk_administration.R
@@ -69,7 +71,7 @@ fun CategoryCarousel(
         } else {
             LazyRow {
                 items(categories) { category ->
-                    CategoryItem(category = category)
+                    CategoryItem(category = category,navController = navController)
                 }
             }
         }
@@ -77,11 +79,19 @@ fun CategoryCarousel(
 }
 
 @Composable
-fun CategoryItem(category: CategoryModel) {
+fun CategoryItem(category: CategoryModel, navController: NavHostController) {
     Card(
         modifier = Modifier
             .size(180.dp)
-            .padding(8.dp),
+            .padding(8.dp)
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = {
+                        // Navegar a la pantalla de detalles de la categoría
+                        navController.navigate("categoryDetails/${category.id}")
+                    }
+                )
+            },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Box {

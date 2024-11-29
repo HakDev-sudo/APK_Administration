@@ -12,7 +12,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.apk_administration.ui.theme.Category.CategoryApiService
+import com.example.apk_administration.ui.theme.Category.CategoryDetailsScreen
 import com.example.apk_administration.ui.theme.Category.CategoryListScreen
+import com.example.apk_administration.ui.theme.Category.CategoryViewModel
 import com.example.apk_administration.ui.theme.Category.ContenidoCategoryEditar
 import com.example.apk_administration.ui.theme.Category.ContenidoCategoryEliminar
 import com.example.apk_administration.ui.theme.NFC.NFCManager
@@ -47,7 +49,8 @@ fun NavigationHost(
     activity: Activity,
     productViewModel: ProductViewModel,
     productoApiService: ProductoApiService,
-    stockMovementViewModel: StockMovementViewModel
+    stockMovementViewModel: StockMovementViewModel,
+    categoryViewModel: CategoryViewModel
 ) {
     NavHost(navController = navController, startDestination = "home") {
         // Pantalla de login
@@ -116,6 +119,16 @@ fun NavigationHost(
             navArgument("id") { type = NavType.IntType })
         ) {
             ContenidoCategoryEliminar(navController, categoryApiService, it.arguments!!.getInt("id"))
+        }
+        composable("categoryDetails/{categoryId}",
+            arguments = listOf(navArgument("categoryId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val categoryId = backStackEntry.arguments?.getInt("categoryId") ?: 0
+            CategoryDetailsScreen(
+                navController,
+                categoryId = categoryId,
+                categoryViewModel
+            )
         }
 
         //Pantallas NFC

@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.apk_administration.ui.theme.Category.CategoryApiService
+import com.example.apk_administration.ui.theme.Category.CategoryViewModel
 import com.example.apk_administration.ui.theme.NFC.NFCManager
 import com.example.apk_administration.ui.theme.NFC.NfcApiService
 import com.example.apk_administration.ui.theme.account.AuthNavHost
@@ -67,7 +68,7 @@ fun AlmacenApp() {
     val productViewModel = ProductViewModel(productoApiService)
     val stockMovementApiService = retrofit.create(StockMovementApiService::class.java)
     val stockMovementViewModel = StockMovementViewModel(stockMovementApiService, nfcApiService, productViewModel)
-
+    val categoryViewModel = CategoryViewModel(categoryApiService,productoApiService)
     // Llamar al CustomScaffold y pasar los servicios API como parámetros
     CustomScaffold(
         navController = navController,
@@ -75,7 +76,8 @@ fun AlmacenApp() {
         categoryApiService = categoryApiService,
         productViewModel = productViewModel,
         productoApiService = productoApiService,
-        stockMovementViewModel = stockMovementViewModel
+        stockMovementViewModel = stockMovementViewModel,
+        categoryViewModel = categoryViewModel
 
     )
 }
@@ -88,7 +90,8 @@ fun CustomScaffold(
     categoryApiService: CategoryApiService,
     productViewModel: ProductViewModel,
     productoApiService: ProductoApiService,
-    stockMovementViewModel: StockMovementViewModel
+    stockMovementViewModel: StockMovementViewModel,
+    categoryViewModel: CategoryViewModel
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -126,7 +129,8 @@ fun CustomScaffold(
                             activity = navController.context as Activity,
                             productViewModel = productViewModel,
                             productoApiService = productoApiService,
-                            stockMovementViewModel = stockMovementViewModel
+                            stockMovementViewModel = stockMovementViewModel,
+                            categoryViewModel = categoryViewModel
 
                         )
                     }
