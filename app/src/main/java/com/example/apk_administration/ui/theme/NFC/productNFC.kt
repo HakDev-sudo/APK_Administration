@@ -1,6 +1,7 @@
 package com.example.apk_administration.ui.theme.NFC
 
 import android.app.Activity
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -38,9 +39,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.apk_administration.ui.theme.common.SuccessMessage
 import com.example.apk_administration.ui.theme.products.ProductModel
 import com.example.apk_administration.ui.theme.products.ProductViewModel
 import com.example.apk_administration.ui.theme.stock.StockMovementViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -104,10 +107,15 @@ fun ProductNFCReaderScreen(
     val scannedNfcTags = remember { mutableSetOf<String>() }
     val snackbarHostState = remember { SnackbarHostState() }
 
+    var showSuccessMessage by remember { mutableStateOf(false) }
+    var successMessage by remember { mutableStateOf("") }
+
     // Estado para el monto total de los productos escaneados
     var totalAmount by remember { mutableStateOf(0.0) }
     // Mantener la lista NFC local y sincronizada
     var currentNfcList by remember { mutableStateOf<List<NfcModel>>(emptyList()) }
+    val coroutineScope = rememberCoroutineScope()
+
     // Actualiza la lista local cuando nfcList cambia
     LaunchedEffect(viewModel.nfcList) {
         currentNfcList = viewModel.nfcList.value
@@ -160,7 +168,11 @@ fun ProductNFCReaderScreen(
             onClearNFCId()
         }
     }
-
+    SuccessMessage(
+        message = successMessage,
+        isVisible = showSuccessMessage,
+        onDismiss = { showSuccessMessage = false }
+    )
     // Interfaz de usuario para mostrar los productos escaneados y permitir eliminarlos
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -263,7 +275,16 @@ fun ProductNFCReaderScreen(
                             productId = product.id,
                             nfcTagId = tagId,
                             quantity = quantity,
-                            description = "Salida de producto registrada desde el lector NFC"
+                            description = "Salida de producto registrada desde el lector NFC",
+                            onSuccess = {
+                                successMessage = "¡Registro de salida exitoso"
+                                showSuccessMessage = true
+                                coroutineScope.launch {
+                                    delay(2000) // Espera 2 segundos
+                                    navController.navigate("nfc")
+                                }
+
+                            }
                         )
                     }
                 }
@@ -273,7 +294,6 @@ fun ProductNFCReaderScreen(
                 scannedNfcTags.clear()
                 totalAmount = 0.0
                 viewModel.refreshNfcs()
-                navController.navigate("nfc")
 
             },
             modifier = Modifier.padding(16.dp)

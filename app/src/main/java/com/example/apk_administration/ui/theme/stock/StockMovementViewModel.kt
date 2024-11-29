@@ -16,7 +16,7 @@ class StockMovementViewModel(
 ) : ViewModel() {
 
     // Función para registrar una salida de producto
-    fun registerProductExit(productId: Int, nfcTagId: Int, quantity: Int, description: String) {
+    fun registerProductExit(productId: Int, nfcTagId: Int, quantity: Int, description: String, onSuccess: () -> Unit) {
         viewModelScope.launch {
             try {
                 // Crear el objeto StockMovementModel con tipo "salida"
@@ -36,6 +36,7 @@ class StockMovementViewModel(
                 if (response.isSuccessful) {
                     // Si el movimiento de salida fue exitoso, actualizar el estado de la etiqueta NFC
                     updateNfcStatusToUnassigned(nfcTagId)
+                    onSuccess()
                 } else {
                     // Manejo de error en el registro de movimiento
                     println("Error al registrar la salida de producto: ${response.errorBody()}")
@@ -86,7 +87,7 @@ class StockMovementViewModel(
     }
 
     // Función para registrar una entrada de producto
-    fun registerProductWithNfc(productId: Int, nfcTagId: Int, quantity: Int, description: String) {
+    fun registerProductWithNfc(productId: Int, nfcTagId: Int, quantity: Int, description: String, onSuccess: () -> Unit ) {
         viewModelScope.launch {
             try {
                 // Crear el objeto StockMovementModel con tipo "salida"
@@ -106,6 +107,7 @@ class StockMovementViewModel(
                 if (response.isSuccessful) {
                     // Actualizar la etiqueta NFC
                     updateNfcAfterStockMovement(nfcTagId, productId)
+                    onSuccess()
                 } else {
                     // Manejo de error en el registro de movimiento
                     println("Error al registrar la salida de producto: ${response.errorBody()}")
@@ -143,6 +145,7 @@ class StockMovementViewModel(
                     if (updateResponse.isSuccessful) {
                         viewModel.loadProducts()
                         viewModel.refreshNfcs()
+
                         println("Etiqueta NFC actualizada correctamente.")
                     } else {
                         println("Error al actualizar la etiqueta NFC: ${updateResponse.errorBody()}")

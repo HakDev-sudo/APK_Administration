@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.Dialog
+import com.example.apk_administration.ui.theme.common.SuccessMessage
 import com.example.apk_administration.ui.theme.products.ProductModel
 import com.example.apk_administration.ui.theme.products.ProductViewModel
 import com.example.apk_administration.ui.theme.stock.StockMovementViewModel
@@ -85,7 +86,7 @@ fun NFCReaderScreen(
     var showConfirmationDialog by remember { mutableStateOf(false) }
     var showUpdateDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
-    var snackbarHostState = remember { SnackbarHostState() }
+    val snackbarHostState = remember { SnackbarHostState() }
     val fechaDeHoy: LocalDate = LocalDate.now()
     var nfcTagId by remember { mutableStateOf<Int?>(null) }
     // Estado para controlar la visibilidad del mensaje
@@ -139,7 +140,11 @@ fun NFCReaderScreen(
         }
     }
 
-
+    SuccessMessage(
+        message = successMessage,
+        isVisible = showSuccessMessage,
+        onDismiss = { showSuccessMessage = false }
+    )
     // Función para registrar el NFC
     fun registerNFC(selectedProduct: ProductModel?) {
         coroutineScope.launch {
@@ -160,6 +165,8 @@ fun NFCReaderScreen(
                 viewModel.refreshNfcs()
                 showConfirmationDialog = false
                 onClearNFCId()
+                successMessage = "Tarjeta registrada con éxito" // Establecer el mensaje de éxito
+                showSuccessMessage = true // Mostrar el mensaje
                 snackbarHostState.showSnackbar("Tarjeta registrada con éxito")
             } else {
                 snackbarHostState.showSnackbar("Error al registrar la tarjeta")
@@ -294,7 +301,11 @@ fun NFCReaderScreen(
                         productId = selectedProduct.id,
                         nfcTagId = nfcTagId!!,
                         quantity = quantity,
-                        description = description
+                        description = description,
+                        onSuccess = {
+                            successMessage = "¡Etiqueta NFC actualizada exitosamente!"
+                            showSuccessMessage = true
+                        }
                     )
                 }
             },

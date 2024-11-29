@@ -10,20 +10,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material.icons.filled.List
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavHostController
 import com.example.apk_administration.R
+import com.example.apk_administration.ui.theme.common.SuccessMessage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,11 +31,8 @@ fun NFCTopBar(navController: NavHostController) {
     TopAppBar(
         title = { Text("Administrar NFC", fontSize = 20.sp, fontWeight = FontWeight.Bold) },
         actions = {
-            IconButton(onClick = { navController.navigate("stock") }) {
-                Icon(Icons.Default.Add, contentDescription = "Listado  NFC")
-            }
-            IconButton(onClick = { /* Acción para filtrar registros NFC */ }) {
-                Icon(Icons.Default.FilterList, contentDescription = "Filtrar NFC")
+            IconButton(onClick = {  }) {
+                Icon(Icons.Default.List, contentDescription = "Listado  NFC")
             }
         }
     )
@@ -61,7 +58,7 @@ fun NFCWindow(padding: PaddingValues, navController: NavHostController) {
         ) {
             // Imagen NFC en la parte superior
             Image(
-                painter = painterResource(id = R.drawable.ice_nfc), // Cambia por tu recurso NFC
+                painter = painterResource(id = R.drawable.ice_nfcr), // Cambia por tu recurso NFC
                 contentDescription = "NFC Image",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
@@ -122,10 +119,3 @@ fun NFCWindow(padding: PaddingValues, navController: NavHostController) {
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewNFCWindow() {
-    MaterialTheme {
-        NFCWindow(padding = PaddingValues(0.dp), navController = NavHostController(LocalContext.current) )
-    }
-}
