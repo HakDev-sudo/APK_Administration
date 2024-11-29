@@ -38,6 +38,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.apk_administration.R
+import com.example.apk_administration.ui.theme.Category.CategoryApiService
 import com.example.apk_administration.ui.theme.products.ProductoApiService
 
 
@@ -46,7 +47,8 @@ import com.example.apk_administration.ui.theme.products.ProductoApiService
 fun HomeScreen(
     padding: PaddingValues,
     navController: NavHostController,
-    servicio: ProductoApiService
+    servicio: ProductoApiService,
+    categoriaServicio: CategoryApiService
 ) {
     // Estado para almacenar el total del stock
     var totalStock by remember { mutableStateOf(0) }
@@ -67,18 +69,12 @@ fun HomeScreen(
             .padding(padding)
     ) {
 
-        // Carrusel de categorías (llamando al nuevo componente)
-        val categories = listOf(
-            Category("Filtros", R.drawable.filtros_1),
-            Category("Aceite", R.drawable.filtros_1),
-            Category("Motores", R.drawable.filtros_1),
-            Category("Respuestos", R.drawable.filtros_1)
-        )
-        CategoryCarousel(categories = categories, navController = navController)
-        Spacer(modifier = Modifier.height(16.dp))
+
+        CategoryCarousel(navController = navController, servicio = categoriaServicio)
+        Spacer(modifier = Modifier.height(12.dp))
         // Botones de acción rápida
         QuickActionButtons(navController = navController)
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         // Panel de estado
 
         // Panel de estado
