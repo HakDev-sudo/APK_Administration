@@ -263,6 +263,7 @@ fun ProductNFCReaderScreen(
             style = MaterialTheme.typography.labelMedium,
             modifier = Modifier.padding(top = 16.dp)
         )
+        YapePaymentScreen()
         // Nuevo botón para registrar la salida de los productos escaneados
         Button(
             onClick = {

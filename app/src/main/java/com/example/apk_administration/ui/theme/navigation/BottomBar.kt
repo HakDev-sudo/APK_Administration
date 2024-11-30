@@ -50,9 +50,9 @@ fun CustomBottomBar(navController: NavHostController,onMenuClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             BottomBarItem(
-                icon = { Icon(Icons.Filled.Menu, contentDescription = "Menu") },
-                label = "Menu",
-                onClick = onMenuClick
+                icon = { Icon(Icons.Filled.List, contentDescription = "Productos") },
+                label = "Productos",
+                onClick = {navController.navigate("admProducts")}
             )
             BottomBarItem(
                 icon = { Icon(Icons.Filled.Nfc, contentDescription = "NFC") },

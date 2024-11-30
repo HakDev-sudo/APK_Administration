@@ -8,6 +8,10 @@ import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -16,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.apk_administration.R
+import com.example.apk_administration.ui.theme.products.ProductViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,7 +41,7 @@ fun CustomTopBar() {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 // Nombre de la empresa
-                Text(text = "TecHunters", style = MaterialTheme.typography.titleMedium)
+                Text(text = "StoreKeeper", style = MaterialTheme.typography.titleMedium)
             }
         },
 
@@ -62,8 +67,4 @@ fun CustomTopBar() {
     )
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewCustomTopBar() {
-    CustomTopBar()
-}
+

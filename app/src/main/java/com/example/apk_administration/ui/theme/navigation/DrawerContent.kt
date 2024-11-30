@@ -31,7 +31,7 @@ fun DrawerContent(navController: NavHostController,drawerState: DrawerState,
         DrawerItem("Inicio", "home") { Icon(Icons.Filled.Home, contentDescription = "Inicio") },
         DrawerItem("Perfil", "perfil") { Icon(Icons.Filled.Person, contentDescription = "Perfil") },
         DrawerItem("Productos", "admProducts") { Icon(Icons.Filled.Inventory, contentDescription = "Productos") },
-        DrawerItem("Usuarios", "admUsers") { Icon(Icons.Filled.People, contentDescription = "Usuarios") },
+        DrawerItem("Categorias", "categoryList") { Icon(Icons.Filled.Category, contentDescription = "Categorías") },
         DrawerItem("Registros", "registros") { Icon(Icons.Filled.ListAlt, contentDescription = "Registros") },
         DrawerItem("Configuración", "setting") { Icon(Icons.Filled.Settings, contentDescription = "Configuración") },
 
