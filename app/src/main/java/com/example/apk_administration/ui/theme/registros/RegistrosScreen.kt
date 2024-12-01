@@ -26,13 +26,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.rounded.FilterList
+import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material3.*
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,9 +51,10 @@ fun RegistroScreen(
     viewModel: StockMovementViewModel,
     productViewModel: ProductViewModel
 ) {
-        val groupedEntries = remember { mutableStateOf<Map<String, Map<Int, Int>>>(emptyMap()) }
+    val groupedEntries = remember { mutableStateOf<Map<String, Map<Int, Int>>>(emptyMap()) }
     val groupedExits = remember { mutableStateOf<Map<String, Map<Int, Int>>>(emptyMap()) }
     val productMap by productViewModel.productIdToNameMap.collectAsState()
+
 
     // Llama a las funciones del ViewModel para obtener los datos agrupados
     LaunchedEffect(Unit) {
@@ -124,20 +129,40 @@ fun RegistroScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FiltroYBotonNuevoRegistro() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+    Surface(
+        tonalElevation = 2.dp,
+        color = MaterialTheme.colorScheme.surface
     ) {
         TopAppBar(
-            title = { Text("Entrada y salidas", fontSize = 20.sp, fontWeight = FontWeight.Bold) },
+            title = {
+                Text(
+                    text = "Entradas y Salidas",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.SemiBold
+                    ),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            },
             actions = {
-                IconButton(onClick = { /* Acción para filtrar productos */ }) {
-                    Icon(Icons.Default.FilterList, contentDescription = "Filtrar Productos")
+                IconButton(
+                    onClick = { /* Acción para filtrar productos */ },
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    ),
+                    modifier = Modifier.padding(end = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.FilterList,
+                        contentDescription = "Filtrar Productos"
+                    )
                 }
-            }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                titleContentColor = MaterialTheme.colorScheme.onSurface
+            ),
+            modifier = Modifier.shadow(4.dp)
         )
     }
 }
@@ -149,53 +174,100 @@ fun RegistroDeProductoCard(
     fecha: String,
     tipo: String
 ) {
-    val (backgroundColor, textColor) = when (tipo) {
-        "Entrada" -> Color(0xFFDFF0D8) to Color(0xFF3C763D)
-        "Salida" -> Color(0xFFF2DEDE) to Color(0xFFA94442)
-        else -> MaterialTheme.colorScheme.surface to MaterialTheme.colorScheme.onSurface
+    val (backgroundColor, textColor, iconTint) = when (tipo) {
+        "Entrada" -> Triple(
+            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f),
+            MaterialTheme.colorScheme.primary,
+            MaterialTheme.colorScheme.primary
+        )
+        "Salida" -> Triple(
+            MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f),
+            MaterialTheme.colorScheme.error,
+            MaterialTheme.colorScheme.error
+        )
+        else -> Triple(
+            MaterialTheme.colorScheme.surface,
+            MaterialTheme.colorScheme.onSurface,
+            MaterialTheme.colorScheme.onSurface
+        )
     }
 
     Card(
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
-        colors = CardDefaults.cardColors(containerColor = backgroundColor)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .shadow(
+                elevation = 4.dp,
+                shape = RoundedCornerShape(16.dp),
+                spotColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+            ),
+        colors = CardDefaults.cardColors(containerColor = backgroundColor),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Row(
             modifier = Modifier
-                .padding(8.dp)
+                .padding(16.dp)
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Columna con detalles del producto
-            Column {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
                 Text(
                     text = producto,
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.SemiBold
+                    ),
+                    color = MaterialTheme.colorScheme.onSurface
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+
                 Text(
                     text = "Cantidad: $cantidad",
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Text(
-                    text = "Fecha: $fecha",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Schedule,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                    )
+                    Text(
+                        text = fecha,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                    )
+                }
             }
 
-            // Columna con tipo y botón de eliminar
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    text = tipo,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = textColor,
-                    modifier = Modifier.align(Alignment.End)
-                )
-
-
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Surface(
+                    color = when (tipo) {
+                        "Entrada" -> MaterialTheme.colorScheme.primaryContainer
+                        "Salida" -> MaterialTheme.colorScheme.errorContainer
+                        else -> MaterialTheme.colorScheme.surfaceVariant
+                    },
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.padding(4.dp)
+                ) {
+                    Text(
+                        text = tipo,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = textColor,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                    )
+                }
             }
         }
     }
