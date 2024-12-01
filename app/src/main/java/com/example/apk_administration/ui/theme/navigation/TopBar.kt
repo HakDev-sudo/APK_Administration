@@ -1,8 +1,13 @@
 package com.example.apk_administration.ui.theme.navigation
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.material3.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.rounded.Close
@@ -16,6 +21,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -32,30 +39,49 @@ fun CustomTopBar(
     viewModel: ProductViewModel,
     isSearching: MutableState<Boolean>
 ) {
-    // Estado para controlar si la barra de búsqueda está activa
-
     val searchQuery = remember { mutableStateOf("") }
 
     TopAppBar(
         title = {
             if (isSearching.value) {
-                // Barra de búsqueda expandida
+                // Barra de búsqueda expandida con mejor diseño
                 TextField(
                     value = searchQuery.value,
                     onValueChange = { query ->
                         searchQuery.value = query
-                        viewModel.searchProducts(query) // Actualiza la lista filtrada en tiempo real
+                        viewModel.searchProducts(query)
                     },
-                    modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("Buscar productos...") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 8.dp),
+                    placeholder = {
+                        Text(
+                            "Buscar productos...",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Rounded.Search,
+                            contentDescription = "Icono búsqueda",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    },
                     singleLine = true,
                     colors = TextFieldDefaults.textFieldColors(
-                        containerColor = Color.Transparent,
-                        cursorColor = Color.Black
-                    )
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                        cursorColor = MaterialTheme.colorScheme.primary,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        focusedLeadingIconColor = MaterialTheme.colorScheme.primary,
+                        unfocusedLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    ),
+                    shape = RoundedCornerShape(24.dp),
+                    textStyle = MaterialTheme.typography.bodyLarge
                 )
             } else {
-                // Título normal cuando no se está buscando
+                // Título normal con mejor diseño
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Start,
@@ -65,51 +91,70 @@ fun CustomTopBar(
                         painter = painterResource(id = R.drawable.logo),
                         contentDescription = "Logo",
                         contentScale = ContentScale.Fit,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(CircleShape)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = "StoreKeeper", style = MaterialTheme.typography.titleMedium)
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = "StoreKeeper",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
                 }
             }
         },
         actions = {
             if (isSearching.value) {
-                // Botón para cerrar la barra de búsqueda
-                IconButton(onClick = {
-                    isSearching.value = false
-                    navController.popBackStack()
-                }) {
+                IconButton(
+                    onClick = {
+                        isSearching.value = false
+                        searchQuery.value = ""
+                        navController.popBackStack()
+                    }
+                ) {
                     Icon(
                         imageVector = Icons.Rounded.Close,
-                        contentDescription = "Cerrar búsqueda"
+                        contentDescription = "Cerrar búsqueda",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             } else {
-                // Botón para abrir la barra de búsqueda
-                IconButton(onClick = {
-                    navController.navigate("productoSearch")
-                    isSearching.value = true
-
-                }) {
+                IconButton(
+                    onClick = {
+                        navController.navigate("productoSearch")
+                        isSearching.value = true
+                    }
+                ) {
                     Icon(
                         imageVector = Icons.Rounded.Search,
-                        contentDescription = "Buscar"
+                        contentDescription = "Buscar",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-            }
-            // Botón de notificaciones
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(
-                    imageVector = Icons.Outlined.Notifications,
-                    contentDescription = "Notificaciones"
-                )
+                IconButton(onClick = { /*TODO*/ }) {
+                    BadgedBox(
+                        badge = {
+                            Badge {
+                                Text("")
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Notifications,
+                            contentDescription = "Notificaciones",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.White,
-            titleContentColor = Color.Black,
-            actionIconContentColor = Color.Black
-        )
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            actionIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+        ),
+        modifier = Modifier.shadow(4.dp)
     )
 }
 

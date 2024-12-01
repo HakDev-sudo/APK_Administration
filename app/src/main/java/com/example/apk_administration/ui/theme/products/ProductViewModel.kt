@@ -25,6 +25,11 @@ class ProductViewModel(private val apiService: ProductoApiService) : ViewModel()
     // Lista filtrada de productos (para búsquedas)
     private val _filteredProductList = MutableStateFlow<List<ProductModel>>(emptyList())
     val filteredProductList: StateFlow<List<ProductModel>> = _filteredProductList
+    //Manejo de errores
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage
 
 
     init {
