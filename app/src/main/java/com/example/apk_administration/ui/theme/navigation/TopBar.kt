@@ -136,7 +136,7 @@ fun CustomTopBar(
                     BadgedBox(
                         badge = {
                             Badge {
-                                Text("")
+                                Text("0")
                             }
                         }
                     ) {

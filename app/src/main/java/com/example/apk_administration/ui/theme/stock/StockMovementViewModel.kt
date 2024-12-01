@@ -3,6 +3,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.apk_administration.ui.theme.NFC.NfcApiService
 import com.example.apk_administration.ui.theme.products.ProductViewModel
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import java.text.SimpleDateFormat
@@ -15,6 +16,8 @@ class StockMovementViewModel(
     private val viewModel: ProductViewModel,
 ) : ViewModel() {
 
+    // Acceso al mapa de IDs a nombres
+    val productIdToNameMap: StateFlow<Map<Int, String>> = viewModel.productIdToNameMap
     // Función para registrar una salida de producto
     fun registerProductExit(productId: Int, nfcTagId: Int, quantity: Int, description: String, onSuccess: () -> Unit) {
         viewModelScope.launch {
@@ -156,6 +159,59 @@ class StockMovementViewModel(
             }
         } catch (e: Exception) {
             println("Exception: ${e.message}")
+        }
+    }
+    //Regsitro
+    fun getGroupedProductEntriesByDate(onSuccess: (Map<String, Map<Int, Int>>) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val response = stockMovementApiService.selectStockMovements()
+                if (response.isNotEmpty()) {
+                    // Filtrar solo los movimientos de tipo "entrada"
+                    val entries = response.filter { it.movementType == "entrada" }
+
+                    // Agrupar por fecha y producto, luego sumar las cantidades
+                    val groupedByDateAndProduct = entries.groupBy { it.date.substring(0, 10) } // Agrupar por fecha (YYYY-MM-DD)
+                        .mapValues { entry -> // Dentro de cada fecha...
+                            entry.value.groupBy { it.product } // Agrupar por producto
+                                .mapValues { productEntry -> // Dentro de cada producto...
+                                    productEntry.value.sumOf { it.quantity } // Sumar las cantidades
+                                }
+                        }
+
+                    onSuccess(groupedByDateAndProduct)
+                } else {
+                    println("No se encontraron movimientos de stock.")
+                }
+            } catch (e: Exception) {
+                println("Error al agrupar entradas: ${e.message}")
+            }
+        }
+    }
+    fun getGroupedProductExitsByDate(onSuccess: (Map<String, Map<Int, Int>>) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val response = stockMovementApiService.selectStockMovements()
+                if (response.isNotEmpty()) {
+                    // Filtrar solo los movimientos de tipo "salida"
+                    val exits = response.filter { it.movementType == "salida" }
+
+                    // Agrupar por fecha y producto, luego sumar las cantidades
+                    val groupedByDateAndProduct = exits.groupBy { it.date.substring(0, 10) } // Agrupar por fecha (YYYY-MM-DD)
+                        .mapValues { entry -> // Dentro de cada fecha...
+                            entry.value.groupBy { it.product } // Agrupar por producto
+                                .mapValues { productEntry -> // Dentro de cada producto...
+                                    productEntry.value.sumOf { it.quantity } // Sumar las cantidades
+                                }
+                        }
+
+                    onSuccess(groupedByDateAndProduct)
+                } else {
+                    println("No se encontraron movimientos de stock.")
+                }
+            } catch (e: Exception) {
+                println("Error al agrupar salidas: ${e.message}")
+            }
         }
     }
 }

@@ -69,7 +69,7 @@ fun NavigationHost(
             SettingsScreenContent(padding)
         }
         composable("perfil") { PerfilScreen(padding) }
-        composable("registros"){RegistroScreen(padding)}
+        composable("registros"){RegistroScreen(padding, stockMovementViewModel, productViewModel)}
         // Pantalla de administración de usuarios
         composable("admUsers") {
             UserManagementScreen(

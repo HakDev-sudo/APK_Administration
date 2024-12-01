@@ -27,15 +27,39 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.*
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.apk_administration.ui.theme.products.ProductViewModel
+import com.example.apk_administration.ui.theme.stock.StockMovementViewModel
 
 @Composable
-fun RegistroScreen(padding: PaddingValues) {
+fun RegistroScreen(
+    padding: PaddingValues,
+    viewModel: StockMovementViewModel,
+    productViewModel: ProductViewModel
+) {
+        val groupedEntries = remember { mutableStateOf<Map<String, Map<Int, Int>>>(emptyMap()) }
+    val groupedExits = remember { mutableStateOf<Map<String, Map<Int, Int>>>(emptyMap()) }
+    val productMap by productViewModel.productIdToNameMap.collectAsState()
+
+    // Llama a las funciones del ViewModel para obtener los datos agrupados
+    LaunchedEffect(Unit) {
+        viewModel.getGroupedProductEntriesByDate { entries ->
+            groupedEntries.value = entries
+        }
+        viewModel.getGroupedProductExitsByDate { exits ->
+            groupedExits.value = exits
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -46,27 +70,56 @@ fun RegistroScreen(padding: PaddingValues) {
         FiltroYBotonNuevoRegistro()
 
         // Lista de registros de productos
+        // Mostrar entradas agrupadas por fecha
+        Text(
+            text = "Entradas",
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(16.dp)
+        )
+        groupedEntries.value.forEach { (date, products) ->
+            Text(
+                text = "Fecha: $date",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(start = 16.dp, top = 8.dp)
+            )
+            products.forEach { (productId, quantity) ->
+                val productName = productMap[productId] ?: "Producto desconocido"
+                RegistroDeProductoCard(
+                    producto = productName, // Puedes reemplazarlo con un nombre real si tienes un mapa ID -> nombre
+                    cantidad = quantity,
+                    fecha = date,
+                    tipo = "Entrada"
+                )
+            }
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
-        RegistroDeProductoCard(
-            producto = "Producto A",
-            cantidad = 50,
-            fecha = "2024-10-01",
-            tipo = "Entrada"
+
+        // Mostrar salidas agrupadas por fecha
+        Text(
+            text = "Salidas",
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(16.dp)
         )
-        RegistroDeProductoCard(
-            producto = "Producto B",
-            cantidad = 20,
-            fecha = "2024-09-30",
-            tipo = "Salida"
-        )
-        RegistroDeProductoCard(
-            producto = "Producto C",
-            cantidad = 10,
-            fecha = "2024-09-29",
-            tipo = "Entrada"
-        )
+        groupedExits.value.forEach { (date, products) ->
+            Text(
+                text = "Fecha: $date",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(start = 16.dp, top = 8.dp)
+            )
+            products.forEach { (productId, quantity) ->
+                val productName = productMap[productId] ?: "Producto desconocido"
+                RegistroDeProductoCard(
+                    producto = productName, // Puedes reemplazarlo con un nombre real si tienes un mapa ID -> nombre
+                    cantidad = quantity,
+                    fecha = date,
+                    tipo = "Salida"
+                )
+            }
+        }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,16 +127,13 @@ fun FiltroYBotonNuevoRegistro() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         TopAppBar(
             title = { Text("Entrada y salidas", fontSize = 20.sp, fontWeight = FontWeight.Bold) },
             actions = {
-                IconButton(onClick = { /* Acción para agregar producto */ }) {
-                    Icon(Icons.Default.Add, contentDescription = "Agregar Producto")
-                }
                 IconButton(onClick = { /* Acción para filtrar productos */ }) {
                     Icon(Icons.Default.FilterList, contentDescription = "Filtrar Productos")
                 }
@@ -145,24 +195,10 @@ fun RegistroDeProductoCard(
                     modifier = Modifier.align(Alignment.End)
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
 
-                IconButton(
-                    onClick = { /* Implementar lógica de eliminar registro */ }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Delete,
-                        contentDescription = "Eliminar registro",
-                        tint = Color.Red
-                    )
-                }
             }
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun RegistroScreenPreview() {
-    RegistroScreen(padding = PaddingValues(0.dp))
-}
+

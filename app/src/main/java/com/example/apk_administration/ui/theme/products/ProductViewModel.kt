@@ -8,7 +8,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.apk_administration.ui.theme.Category.CategoryModel
 import com.example.apk_administration.ui.theme.NFC.NfcModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class ProductViewModel(private val apiService: ProductoApiService) : ViewModel() {
@@ -30,7 +33,10 @@ class ProductViewModel(private val apiService: ProductoApiService) : ViewModel()
     val isLoading: StateFlow<Boolean> = _isLoading
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
-
+    // Mapa de IDs a nombres
+    val productIdToNameMap: StateFlow<Map<Int, String>> = _productList.map { productList ->
+        productList.associate { it.id to it.name }
+    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyMap())
 
     init {
         loadProducts()
