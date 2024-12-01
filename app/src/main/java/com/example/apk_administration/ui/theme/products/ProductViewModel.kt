@@ -22,6 +22,10 @@ class ProductViewModel(private val apiService: ProductoApiService) : ViewModel()
     // Lista de etiquetas NFC
     private val _nfcList = MutableStateFlow<List<NfcModel>>(emptyList())
     val nfcList: StateFlow<List<NfcModel>> = _nfcList
+    // Lista filtrada de productos (para búsquedas)
+    private val _filteredProductList = MutableStateFlow<List<ProductModel>>(emptyList())
+    val filteredProductList: StateFlow<List<ProductModel>> = _filteredProductList
+
 
     init {
         loadProducts()
@@ -34,6 +38,7 @@ class ProductViewModel(private val apiService: ProductoApiService) : ViewModel()
             try {
                 val products = apiService.selectProductos() // Obtiene todos los productos de la API
                 _productList.value = products
+                _filteredProductList.value = products
             } catch (e: Exception) {
                 // Manejo de errores
                 Log.e("ProductViewModel", "Error al cargar productos: ${e.message}")
@@ -80,5 +85,17 @@ class ProductViewModel(private val apiService: ProductoApiService) : ViewModel()
     fun getNfcTagsByProduct(productId: Int): List<NfcModel> {
         return _nfcList.value.filter { it.product == productId }
     }
+
+    // Método para buscar productos por nombre
+    fun searchProducts(query: String) {
+        viewModelScope.launch {
+            _filteredProductList.value = if (query.isNotEmpty()) {
+                _productList.value.filter { it.name.contains(query, ignoreCase = true) }
+            } else {
+                _productList.value // Devuelve todos los productos si la búsqueda está vacía
+            }
+        }
+    }
+
 
 }

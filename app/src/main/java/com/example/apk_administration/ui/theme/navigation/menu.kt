@@ -12,14 +12,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -95,6 +101,17 @@ fun CustomScaffold(
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    var isExtended by remember { mutableStateOf(true) }
+    val isSearching = remember { mutableStateOf(false) }
+    // Observa cambios en la ruta actual
+    val currentRoute = navController.currentBackStackEntryFlow.collectAsState(initial = null)
+    // Resetea la barra de búsqueda automáticamente al cambiar de pantalla
+    // Resetea la barra de búsqueda solo si cambias de ruta
+    LaunchedEffect(currentRoute.value) {
+        if (currentRoute.value?.destination?.route != "productoSearch") {
+            isSearching.value = false
+        }
+    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -112,9 +129,9 @@ fun CustomScaffold(
         ) {
             Scaffold(
 
-                topBar = { CustomTopBar() },
+                topBar = { CustomTopBar(navController, productViewModel,isSearching) },
                 bottomBar = { CustomBottomBar(navController) { scope.launch { drawerState.open() } } },
-                floatingActionButton = { CustomFAB() },
+                floatingActionButton = { CustomFAB(isExtended) },
                 // Aquí aseguramos que el contenido principal se ajuste correctamente
                 content = { padding ->
                     Box(
@@ -141,17 +158,14 @@ fun CustomScaffold(
 }
 
 @Composable
-fun CustomFAB() {
-    FloatingActionButton(
-        // Color de fondo
-        //backgroundColor = MaterialTheme.colors.primary,
-        // Acción al hacer clic en el botón (sin definir)
-        onClick = { /*TODO*/ }) {
-        Text(
-            fontSize = 12.sp, // Tamaño de fuente del texto del botón
-            text = "Añadir Registro" // Texto del botón
-        )
-    }
+fun CustomFAB(isExtended: Boolean) {
+    ExtendedFloatingActionButton(
+        onClick = { /* TODO */ },
+        expanded = isExtended,
+        icon = { Icon(Icons.Filled.Add, "Añadir") },
+        text = { Text("Añadir Registro", fontSize = 10.sp) },
+        containerColor = MaterialTheme.colorScheme.primary
+    )
 }
 
 

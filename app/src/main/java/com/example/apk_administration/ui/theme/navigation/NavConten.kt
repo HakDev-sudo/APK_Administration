@@ -31,6 +31,7 @@ import com.example.apk_administration.ui.theme.products.AddOrEditProductScreen
 import com.example.apk_administration.ui.theme.products.ContenidoProductoEliminar
 import com.example.apk_administration.ui.theme.products.ProductManagementScreen
 import com.example.apk_administration.ui.theme.products.ProductModel
+import com.example.apk_administration.ui.theme.products.ProductSearchScreen
 import com.example.apk_administration.ui.theme.products.ProductViewModel
 import com.example.apk_administration.ui.theme.products.ProductoApiService
 import com.example.apk_administration.ui.theme.products.ProductoDetailScreen
@@ -101,6 +102,7 @@ fun NavigationHost(
         ) {
             ProductoDetailScreen(productId = it.arguments!!.getInt("id"), navController = navController, productoApiService, nfcApiService)
         }
+        composable("productoSearch") {ProductSearchScreen(productViewModel, navController)}
 
 
         //Pantallas de categorias

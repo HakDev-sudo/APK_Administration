@@ -165,7 +165,10 @@ fun ProductList(
 // Pantalla completa de administración de productos
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProductManagementScreen(servicio: ProductoApiService, navController: NavHostController) {
+fun ProductManagementScreen(
+    servicio: ProductoApiService,
+    navController: NavHostController
+) {
     var productos by remember { mutableStateOf(emptyList<ProductModel>()) }
     var categorias by remember { mutableStateOf(mapOf<Int, String>()) }
     var nfcs by remember { mutableStateOf(mapOf<Int, String>()) }
