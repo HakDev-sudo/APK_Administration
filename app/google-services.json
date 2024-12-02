@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "789259082656",
+    "project_id": "nfcstore-7abfe",
+    "storage_bucket": "nfcstore-7abfe.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:789259082656:android:59d63fbb9609d7979ae2c5",
+        "android_client_info": {
+          "package_name": "com.example.apk_administration"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAN13KQ8EQRg-UutjoMWoOuG57gM9Wnxgk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

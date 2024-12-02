@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults.buttonColors
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DividerDefaults.color
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
@@ -22,7 +23,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarDefaults.color
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -43,7 +46,22 @@ import androidx.navigation.NavHostController
 import com.example.apk_administration.R
 
 @Composable
-fun LoginStructre(navController: NavHostController, modifier: Modifier = Modifier) {
+fun LoginStructre(
+    navController: NavHostController,
+    authViewModel: AuthViewModel,
+    modifier: Modifier = Modifier
+) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    val isLoading by authViewModel.isLoading.observeAsState(false)
+
+    // Observar el estado de autenticación
+    LaunchedEffect(authViewModel.authState.observeAsState().value) {
+        val user = authViewModel.authState.value
+        if (user != null) {
+            navController.navigate("home") // Navegar a la pantalla principal si está autenticado
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -67,10 +85,14 @@ fun LoginStructre(navController: NavHostController, modifier: Modifier = Modifie
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                GeetingInputsLog(modifier)
-                GeetingBuntosnEnter(
+                GeetingInputsLog(modifier, email, { email = it }, password, { password = it })
+                GeetingButtonsEnter(
                     modifier = Modifier,
-                    navController = navController
+                    email = email,
+                    password = password,
+                    isLoading = isLoading,
+                    onLoginClick = { authViewModel.signIn(email, password) },
+                    onRegisterNavigate = { navController.navigate("register") }
                 )
                 GeetingButtonsLog(modifier)
             }
@@ -96,17 +118,13 @@ fun GeetingLogoLog(modifier: Modifier){
 
 }
 @Composable
-fun GeetingInputsLog(modifier: Modifier){
-    var email by remember {
-        mutableStateOf("")
-    }
-    var password by remember{
-        mutableStateOf("")
-    }
-
-    var isCorrect by remember {
-        mutableStateOf(true)
-    }
+fun GeetingInputsLog(
+    modifier: Modifier,
+    email: String,
+    onEmailChange: (String) -> Unit,
+    password: String,
+    onPasswordChange: (String) -> Unit
+){
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -115,13 +133,16 @@ fun GeetingInputsLog(modifier: Modifier){
         verticalArrangement = Arrangement.Center
     ) {
         OutlinedTextField(
-            value = email, onValueChange ={email = it},
+            value = email,
+            onValueChange = onEmailChange,
             label = { Text(text = "Ingrese su correo") },
             suffix = { Text(text = "@gmail.com") },
         )
-        OutlinedTextField(value = password, onValueChange ={password = it},
-            label = { Text(text = "Ingrese su contraseña")},
-            placeholder = { Text(text = "Contraseña")},
+        OutlinedTextField(
+            value = password,
+            onValueChange = onPasswordChange,
+            label = { Text(text = "Ingrese su contraseña") },
+            placeholder = { Text(text = "Contraseña") },
             visualTransformation = PasswordVisualTransformation()
         )
     }
@@ -130,18 +151,33 @@ fun GeetingInputsLog(modifier: Modifier){
 
 
 @Composable
-fun GeetingBuntosnEnter(modifier: Modifier, navController: NavHostController) {
+fun GeetingButtonsEnter(
+    modifier: Modifier,
+    email: String,
+    password: String,
+    isLoading: Boolean,
+    onLoginClick: () -> Unit,
+    onRegisterNavigate: () -> Unit
+) {
     Column(modifier = Modifier) {
         OutlinedButton(
-            onClick = { navController.navigate("home") }, // Navegar a CustomScaffold
+            onClick = {
+                if (email.isNotEmpty() && password.isNotEmpty()) {
+                    onLoginClick()
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 20.dp, start = 20.dp, end = 20.dp)
         ) {
-            Text(text = "Entrar")
+            if (isLoading) {
+                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(16.dp))
+            } else {
+                Text(text = "Entrar")
+            }
         }
         OutlinedButton(
-            onClick = { navController.navigate("basic_info") },
+            onClick = onRegisterNavigate,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 20.dp, end = 20.dp)
@@ -175,29 +211,8 @@ fun GeetingButtonsLog(modifier : Modifier){
             Spacer(modifier = Modifier.width(12.dp))
             Text("Registrarse con Google")
         }
-
-        OutlinedButton(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp, start = 20.dp, end = 20.dp, bottom = 20.dp),
-            onClick = {}
-        ){
-            Icon(painter = painterResource(id = R.drawable.facebook), contentDescription ="Facebook Logo" , tint = Color.Unspecified)
-            Spacer(modifier = Modifier.width(12.dp))
-            Text(text = "Registrase con Facebook")
-        }
     }
 
 }
 
 
-@Composable
-fun recoveriCount(modifier: Modifier){
-
-}
-
-@Preview(showBackground = true)
-@Composable
-fun previewsTotal(){
-    LoginStructre(navController = NavHostController(LocalContext.current),modifier = Modifier)
-}
