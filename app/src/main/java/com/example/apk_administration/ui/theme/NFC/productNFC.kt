@@ -43,6 +43,7 @@ import com.example.apk_administration.ui.theme.common.SuccessMessage
 import com.example.apk_administration.ui.theme.products.ProductModel
 import com.example.apk_administration.ui.theme.products.ProductViewModel
 import com.example.apk_administration.ui.theme.stock.StockMovementViewModel
+import com.google.gson.Gson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -267,6 +268,20 @@ fun ProductNFCReaderScreen(
         // Nuevo botón para registrar la salida de los productos escaneados
         Button(
             onClick = {
+                // Lista para almacenar los detalles de los productos para la boleta
+                val productDetails = scannedProducts.map { (productKey, quantity) ->
+                    val (product, _) = productKey
+                    ProductDetail(
+                        name = product.name,
+                        quantity = quantity,
+                        unitPrice = product.price,
+                        subtotal = product.price * quantity
+                    )
+                }
+
+                // Serializar los detalles de los productos a JSON
+                val productDataJson = Gson().toJson(productDetails)
+
                 scannedProducts.forEach { (productKey, quantity) ->
                     val (product, idTag) = productKey
                     val nfcTagId = nfcList.find { it.idTag == idTag }?.id
@@ -281,8 +296,9 @@ fun ProductNFCReaderScreen(
                                 successMessage = "¡Registro de salida exitoso"
                                 showSuccessMessage = true
                                 coroutineScope.launch {
-                                    delay(2000) // Espera 2 segundos
-                                    navController.navigate("nfc")
+                                    delay(1000)
+                                    navController.navigate("receipt/${Uri.encode(productDataJson)}")
+
                                 }
 
                             }

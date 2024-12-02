@@ -6,6 +6,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -21,8 +22,10 @@ import com.example.apk_administration.ui.theme.NFC.NFCManager
 import com.example.apk_administration.ui.theme.NFC.NFCReaderScreen
 import com.example.apk_administration.ui.theme.NFC.NFCWindow
 import com.example.apk_administration.ui.theme.NFC.NfcApiService
+import com.example.apk_administration.ui.theme.NFC.ProductDetail
 import com.example.apk_administration.ui.theme.NFC.ProductNFCReader
 import com.example.apk_administration.ui.theme.NFC.ProductNFCReaderScreen
+import com.example.apk_administration.ui.theme.NFC.ReceiptScreen
 import com.example.apk_administration.ui.theme.administraruser.User
 import com.example.apk_administration.ui.theme.administraruser.UserManagementScreen
 import com.example.apk_administration.ui.theme.home.HomeScreen
@@ -39,6 +42,7 @@ import com.example.apk_administration.ui.theme.registros.RegistroScreen
 import com.example.apk_administration.ui.theme.settings.SettingsScreenContent
 import com.example.apk_administration.ui.theme.stock.StockMovementViewModel
 import com.example.apk_administration.ui.theme.user.PerfilScreen
+import com.google.gson.Gson
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -75,8 +79,6 @@ fun NavigationHost(
             UserManagementScreen(
                 users = listOf(
                     User(name = "Juan Pérez", role = "Administrador", email = "juan.perez@example.com"),
-                    User(name = "Ana Gómez", role = "Supervisor", email = "ana.gomez@example.com"),
-                    User(name = "Luis Martínez", role = "Operador", email = "luis.martinez@example.com")
                 ),
                 padding = padding
             )
@@ -141,6 +143,15 @@ fun NavigationHost(
             ProductNFCReader(activity, productViewModel, nfcApiService, stockMovementViewModel, navController)
         }
         //stock
+        composable(
+            route = "receipt/{receiptDataJson}",
+            arguments = listOf(navArgument("receiptDataJson") { type = NavType.StringType })
+        ) { backStackEntry ->
+            // Obtener el JSON de los datos desde los argumentos
+            val receiptDataJson = backStackEntry.arguments?.getString("receiptDataJson") ?: ""
+            // Mostrar la pantalla de boleta
+            ReceiptScreen(receiptDataJson = receiptDataJson,navController)
+        }
 
     }
 }
