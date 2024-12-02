@@ -28,90 +28,131 @@ import com.example.apk_administration.ui.theme.common.SuccessMessage
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NFCTopBar(navController: NavHostController) {
-    TopAppBar(
-        title = { Text("Administrar NFC", fontSize = 20.sp, fontWeight = FontWeight.Bold) },
+    SmallTopAppBar(
+        title = {
+            Text(
+                text = "Administrar NFC",
+                style = MaterialTheme.typography.titleLarge
+            )
+        },
         actions = {
-            IconButton(onClick = { navController.navigate("nfc_list") }) {
-                Icon(Icons.Default.List, contentDescription = "Listado  NFC")
+            IconButton(
+                onClick = { navController.navigate("nfc_list") }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.List,
+                    contentDescription = "Listado NFC"
+                )
             }
-        }
+        },
+        colors = TopAppBarDefaults.smallTopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            titleContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     )
 }
 
 @Composable
 fun NFCWindow(padding: PaddingValues, navController: NavHostController) {
-    Column(
+    Surface(
         modifier = Modifier
             .fillMaxSize()
-            .padding(padding)
+            .padding(padding),
+        color = MaterialTheme.colorScheme.background
     ) {
-        // Barra superior con agregar y filtros
-        NFCTopBar(navController = navController)
-
-        // Contenido de la pantalla NFC
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxSize()
         ) {
-            // Imagen NFC en la parte superior
-            Image(
-                painter = painterResource(id = R.drawable.ice_nfcr), // Cambia por tu recurso NFC
-                contentDescription = "NFC Image",
-                contentScale = ContentScale.Fit,
+            NFCTopBar(navController = navController)
+
+            Box(
                 modifier = Modifier
-                    .size(150.dp)
-                    .padding(top = 16.dp)
-            )
-
-            // Título grande centrado
-            Text(
-                text = "Registro NFC",
-                fontSize = 32.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(16.dp)
-            )
-
-            // Botones de "Registro de entrada" y "Registro de salida"
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxSize()
+                    .padding(24.dp)
             ) {
-                // Botón de "Registro de Entrada"
-                Button(
-                    onClick = { navController.navigate("nfc_reader") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 32.dp, vertical = 8.dp)
+                Card(
+                    modifier = Modifier.fillMaxSize(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowForward,
-                        contentDescription = "Registro de entrada",
-                        modifier = Modifier.size(24.dp),
-                        tint = Color.White
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = "Registrar Entrada", fontSize = 18.sp)
-                }
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(24.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ice_nfcr),
+                            contentDescription = "NFC Image",
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier
+                                .size(180.dp)
+                                .padding(16.dp)
+                        )
 
-                // Botón de "Registro de Salida"
-                Button(
-                    onClick = { navController.navigate("nfc_producto") },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 32.dp, vertical = 8.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = "Registro de salida",
-                        modifier = Modifier.size(24.dp),
-                        tint = Color.White
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = "Registrar Salida", fontSize = 18.sp)
+                        Text(
+                            text = "Registro NFC",
+                            style = MaterialTheme.typography.headlineLarge,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textAlign = TextAlign.Center
+                        )
+
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            ElevatedButton(
+                                onClick = { navController.navigate("nfc_reader") },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(56.dp)
+                                    .padding(horizontal = 16.dp),
+                                colors = ButtonDefaults.elevatedButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary
+                                )
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.ArrowForward,
+                                    contentDescription = "Registro de entrada",
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text(
+                                    text = "Registrar Entrada",
+                                    style = MaterialTheme.typography.titleMedium.copy(color = Color.White)
+                                )
+                            }
+
+                            ElevatedButton(
+                                onClick = { navController.navigate("nfc_producto") },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(56.dp)
+                                    .padding(horizontal = 16.dp),
+                                colors = ButtonDefaults.elevatedButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.error
+                                )
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.ArrowBack,
+                                    contentDescription = "Registro de salida",
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text(
+                                    text = "Registrar Salida",
+                                    style = MaterialTheme.typography.titleMedium.copy(color = Color.White)
+
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }

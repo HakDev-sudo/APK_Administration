@@ -31,7 +31,7 @@ import com.example.apk_administration.ui.theme.NFC.ReceiptScreen
 import com.example.apk_administration.ui.theme.administraruser.User
 import com.example.apk_administration.ui.theme.administraruser.UserManagementScreen
 import com.example.apk_administration.ui.theme.home.HomeScreen
-import com.example.apk_administration.ui.theme.login.LoginStructre
+import com.example.apk_administration.ui.theme.login.LoginStructure
 import com.example.apk_administration.ui.theme.products.AddOrEditProductScreen
 import com.example.apk_administration.ui.theme.products.ContenidoProductoEliminar
 import com.example.apk_administration.ui.theme.products.ProductManagementScreen

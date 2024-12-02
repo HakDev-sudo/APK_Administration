@@ -37,7 +37,7 @@ fun AppNavigation(authviewModel: AuthViewModel) {
 
     NavHost(navController = authnavController, startDestination = "login") {
         composable("login") {
-            LoginStructre(
+            LoginStructure(
                 navController = authnavController,
                 authViewModel = authviewModel,
                 modifier = Modifier

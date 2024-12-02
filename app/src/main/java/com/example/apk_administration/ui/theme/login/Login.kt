@@ -38,10 +38,11 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.apk_administration.R
+import com.example.apk_administration.ui.theme.common.ErrorStateWithSnackbar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginStructre(
+fun LoginStructure(
     navController: NavHostController,
     authViewModel: AuthViewModel,
     modifier: Modifier = Modifier
@@ -49,12 +50,14 @@ fun LoginStructre(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val isLoading by authViewModel.isLoading.observeAsState(false)
+    val errorMessage by authViewModel.errorMessage.observeAsState(null)
 
-    // Observar el estado de autenticación
     LaunchedEffect(authViewModel.authState.observeAsState().value) {
         val user = authViewModel.authState.value
         if (user != null) {
-            navController.navigate("home")
+            navController.navigate("home") {
+                popUpTo("login") { inclusive = true }
+            }
         }
     }
 
@@ -68,6 +71,17 @@ fun LoginStructre(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Manejo de errores con ErrorStateWithSnackbar
+            if (!errorMessage.isNullOrEmpty()) {
+                ErrorStateWithSnackbar(
+                    errorMessage = errorMessage ?: "",
+                    onRetry = {
+                        authViewModel.signIn(email, password)
+                    },
+                    onDismiss = { authViewModel.clearError() }
+                )
+            }
+
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -136,9 +150,7 @@ fun LoginStructre(
 
                     Button(
                         onClick = {
-                            if (email.isNotEmpty() && password.isNotEmpty()) {
-                                authViewModel.signIn(email, password)
-                            }
+                            authViewModel.signIn(email, password)
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -166,6 +178,7 @@ fun LoginStructre(
         }
     }
 }
+
 
 @Composable
 fun GeetingLogoLog(modifier: Modifier) {
