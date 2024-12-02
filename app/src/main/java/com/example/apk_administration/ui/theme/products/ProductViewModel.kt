@@ -15,6 +15,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class ProductViewModel(private val apiService: ProductoApiService) : ViewModel() {
+    private val _loadingErrorMessage = MutableStateFlow<String?>(null)
+    val loadingErrorMessage: StateFlow<String?> = _loadingErrorMessage
 
     // Lista de productos usando el nuevo modelo ProductModel
     private val _productList = MutableStateFlow<List<ProductModel>>(emptyList())
@@ -38,24 +40,38 @@ class ProductViewModel(private val apiService: ProductoApiService) : ViewModel()
         productList.associate { it.id to it.name }
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyMap())
 
+    private val _operationStatus = MutableStateFlow<String?>(null) // Mensaje de éxito o error
+    val operationStatus: StateFlow<String?> = _operationStatus
+
     init {
         loadProducts()
         loadCategories()
         loadNfcs()
     }
 
-    public fun loadProducts() {
+    fun loadProducts() {
         viewModelScope.launch {
             try {
                 val products = apiService.selectProductos() // Obtiene todos los productos de la API
                 _productList.value = products
                 _filteredProductList.value = products
+                _loadingErrorMessage.value = null // Resetea el error si la carga es exitosa
             } catch (e: Exception) {
                 // Manejo de errores
                 Log.e("ProductViewModel", "Error al cargar productos: ${e.message}")
+                _loadingErrorMessage.value = "Error al cargar los productos. Intenta nuevamente."
             }
         }
     }
+
+    fun canDeleteProduct(productId: Int): Boolean {
+        val product = _productList.value.find { it.id == productId }
+        val hasNfcTags = _nfcList.value.any { it.product == productId }
+        val hasStock = product?.stock ?: 0 > 0
+
+        return !hasNfcTags && !hasStock
+    }
+
     private fun loadCategories() {
         viewModelScope.launch {
             try {
@@ -107,6 +123,27 @@ class ProductViewModel(private val apiService: ProductoApiService) : ViewModel()
             }
         }
     }
+
+    fun deleteProduct(productId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = apiService.deleteProducto(productId)
+                if (response.isSuccessful) {
+                    _operationStatus.value = "Producto eliminado exitosamente."
+                    refreshProducts()
+                } else {
+                    _operationStatus.value = "Error al eliminar el producto. Intenta nuevamente."
+                }
+            } catch (e: Exception) {
+                _operationStatus.value = "Error al comunicarse con el servidor: ${e.message}"
+            }
+        }
+    }
+
+    fun clearOperationStatus() {
+        _operationStatus.value = null // Limpia el mensaje después de que haya sido manejado
+    }
+
 
 
 }
