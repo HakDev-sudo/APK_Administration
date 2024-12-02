@@ -71,7 +71,7 @@ class SimpleWidget : GlanceAppWidgetReceiver() {
 
 
 object RetrofitInstance {
-    private const val BASE_URL = "http://192.168.18.33:8000/"
+    private const val BASE_URL = "https://octopus-app-o74mu.ondigitalocean.app/"
 
     val apiService: ProductoApiService by lazy {
         Retrofit.Builder()

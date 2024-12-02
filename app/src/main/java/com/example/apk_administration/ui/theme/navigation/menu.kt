@@ -37,18 +37,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.apk_administration.ui.theme.Category.CategoryApiService
 import com.example.apk_administration.ui.theme.Category.CategoryViewModel
 import com.example.apk_administration.ui.theme.NFC.NFCManager
 import com.example.apk_administration.ui.theme.NFC.NfcApiService
 import com.example.apk_administration.ui.theme.NFC.NfcViewModel
-import com.example.apk_administration.ui.theme.account.AuthNavHost
+
 import com.example.apk_administration.ui.theme.home.HomeScreen
+import com.example.apk_administration.ui.theme.login.AuthViewModel
 import com.example.apk_administration.ui.theme.products.ProductViewModel
 import com.example.apk_administration.ui.theme.products.ProductoApiService
 import com.example.apk_administration.ui.theme.stock.StockMovementApiService
 import com.example.apk_administration.ui.theme.stock.StockMovementViewModel
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.GsonBuilder
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
@@ -58,8 +62,10 @@ import retrofit2.converter.gson.GsonConverterFactory
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AlmacenApp() {
+
     // Configuración de Retrofit y creación de servicios API
-    val urlBase = "http://192.168.18.33:8000/" // o tu IP si usarás un dispositivo externo
+
+    val urlBase = "https://octopus-app-o74mu.ondigitalocean.app/" // o tu IP si usarás un dispositivo externo
     val gson = GsonBuilder().serializeNulls().create()
     val retrofit = Retrofit.Builder().baseUrl(urlBase)
         .addConverterFactory(GsonConverterFactory.create(gson)).build()
@@ -77,7 +83,16 @@ fun AlmacenApp() {
     val stockMovementViewModel = StockMovementViewModel(stockMovementApiService, nfcApiService, productViewModel)
     val categoryViewModel = CategoryViewModel(categoryApiService,productoApiService)
     val nfcViewModel = NfcViewModel(nfcApiService)
+    val authViewModel = AuthViewModel(
+        auth = com.google.firebase.auth.FirebaseAuth.getInstance(),
+        firestore = FirebaseFirestore.getInstance()
+    )
+    //
+    val authnavController = rememberNavController()
 
+
+    //
+    val onLogout: () -> Unit
     // Llamar al CustomScaffold y pasar los servicios API como parámetros
     CustomScaffold(
         navController = navController,
@@ -87,7 +102,14 @@ fun AlmacenApp() {
         productoApiService = productoApiService,
         stockMovementViewModel = stockMovementViewModel,
         categoryViewModel = categoryViewModel,
-        nfcViewModel = nfcViewModel
+        nfcViewModel = nfcViewModel,
+        authViewModel = authViewModel,
+        onLogout = {
+
+
+
+        }
+
 
     )
 }
@@ -102,7 +124,9 @@ fun CustomScaffold(
     productoApiService: ProductoApiService,
     stockMovementViewModel: StockMovementViewModel,
     categoryViewModel: CategoryViewModel,
-    nfcViewModel: NfcViewModel
+    nfcViewModel: NfcViewModel,
+    authViewModel: AuthViewModel,
+    onLogout: () -> Unit
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -134,7 +158,7 @@ fun CustomScaffold(
         ) {
             Scaffold(
 
-                topBar = { CustomTopBar(navController, productViewModel,isSearching) },
+                topBar = { CustomTopBar(navController, productViewModel,isSearching,authViewModel,onLogout) },
                 bottomBar = { CustomBottomBar(navController) { scope.launch { drawerState.open() } } },
 
                 // Aquí aseguramos que el contenido principal se ajuste correctamente

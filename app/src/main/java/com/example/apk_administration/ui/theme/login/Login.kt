@@ -1,27 +1,27 @@
 package com.example.apk_administration.ui.theme.login
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ButtonDefaults.buttonColors
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DividerDefaults.color
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SnackbarDefaults.color
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -31,20 +31,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.content.pm.PermissionInfoCompat.Protection
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.apk_administration.R
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginStructre(
     navController: NavHostController,
@@ -59,64 +54,138 @@ fun LoginStructre(
     LaunchedEffect(authViewModel.authState.observeAsState().value) {
         val user = authViewModel.authState.value
         if (user != null) {
-            navController.navigate("home") // Navegar a la pantalla principal si está autenticado
+            navController.navigate("home")
         }
     }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Transparent)
+
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
     ) {
-        Box(modifier = Modifier) {
-            Column(
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 100.dp, start = 50.dp, end = 50.dp, bottom = 0.dp)
-                    .border(20.dp, Color(0xFF2196F3), RoundedCornerShape(20.dp))
-                    .padding(10.dp)
-                    .background(Color(0xFF2196F3)),
+                    .padding(top = 48.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
-                GeetingLogoLog(modifier)
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    GeetingLogoLog(modifier)
+                }
             }
-            Column(
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Card(
                 modifier = Modifier
-                    .padding(start = 50.dp, end = 50.dp, top = 255.dp)
-                    .border(4.dp, Color(0xFF2196F3), RoundedCornerShape(20.dp)),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
+                    .fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
-                GeetingInputsLog(modifier, email, { email = it }, password, { password = it })
-                GeetingButtonsEnter(
-                    modifier = Modifier,
-                    email = email,
-                    password = password,
-                    isLoading = isLoading,
-                    onLoginClick = { authViewModel.signIn(email, password) },
-                    onRegisterNavigate = { navController.navigate("register") }
-                )
-                GeetingButtonsLog(modifier)
+                Column(
+                    modifier = Modifier
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = "Iniciar Sesión",
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = { Text("Correo electrónico") },
+                        suffix = { Text("@gmail.com") },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
+
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text("Contraseña") },
+                        visualTransformation = PasswordVisualTransformation(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
+
+                    Button(
+                        onClick = {
+                            if (email.isNotEmpty() && password.isNotEmpty()) {
+                                authViewModel.signIn(email, password)
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        enabled = !isLoading
+                    ) {
+                        if (isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        } else {
+                            Text("Iniciar Sesión")
+                        }
+                    }
+
+                    TextButton(
+                        onClick = { navController.navigate("register") },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("¿No tienes cuenta? Regístrate")
+                    }
+                }
             }
         }
     }
 }
 
-
 @Composable
-fun GeetingLogoLog(modifier: Modifier){
-    Column (
+fun GeetingLogoLog(modifier: Modifier) {
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxSize(0.2.toFloat()),
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
-
-
-
-    ){
-        Image(painter = painterResource(id = R.drawable.logo), contentDescription ="", modifier = Modifier.size(170.dp) )
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.logo02),
+            contentDescription = "Logo",
+            modifier = Modifier
+                .size(120.dp)
+                .clip(RoundedCornerShape(8.dp))
+        )
     }
-
 }
+
 @Composable
 fun GeetingInputsLog(
     modifier: Modifier,
@@ -194,23 +263,7 @@ fun GeetingButtonsLog(modifier : Modifier){
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ){
-        OutlinedButton(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp, start = 20.dp, end = 20.dp),
-            onClick = {  },
-            enabled = true,
-            // add background color
-            colors = buttonColors(colorResource(id = R.color.black,))
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.google),
-                contentDescription = "Google Logo",
-                tint = Color.Unspecified
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Text("Registrarse con Google")
-        }
+
     }
 
 }
