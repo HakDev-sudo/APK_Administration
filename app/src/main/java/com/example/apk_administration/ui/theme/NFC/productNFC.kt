@@ -231,7 +231,7 @@ fun ProductNFCReaderScreen(
                         Text("Nombre: ${product.name}")
                         Text("Precio Unitario: ${product.price}")
                         Text("Cantidad: $quantity")
-                        Text("Subtotal: $${"%.2f".format(subtotal)}", fontWeight = FontWeight.Bold)
+                        Text("Subtotal: S/ ${"%.2f".format(subtotal)}", fontWeight = FontWeight.Bold)
                     }
 
                     // Botón para eliminar el producto de la lista

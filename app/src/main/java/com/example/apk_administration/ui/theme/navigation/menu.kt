@@ -131,7 +131,7 @@ fun CustomScaffold(
 
                 topBar = { CustomTopBar(navController, productViewModel,isSearching) },
                 bottomBar = { CustomBottomBar(navController) { scope.launch { drawerState.open() } } },
-                floatingActionButton = { CustomFAB(isExtended) },
+
                 // Aquí aseguramos que el contenido principal se ajuste correctamente
                 content = { padding ->
                     Box(
