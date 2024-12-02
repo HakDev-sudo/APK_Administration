@@ -8,12 +8,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.rounded.FilterAltOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -222,11 +224,26 @@ fun ProductManagementScreen(
                         showFilterSheet = false // Cerrar el modal
                     },
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp)
+                        .align(Alignment.End)
+                        .padding(bottom = 16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    ),
+                    shape = RoundedCornerShape(20.dp)
                 ) {
-                    Text("Quitar Filtros")
+                    Icon(
+                        imageVector = Icons.Rounded.FilterAltOff,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        "Quitar Filtros",
+                        style = MaterialTheme.typography.labelLarge
+                    )
                 }
+
             }
         }
 

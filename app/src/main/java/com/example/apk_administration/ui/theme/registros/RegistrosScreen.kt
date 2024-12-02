@@ -1,5 +1,6 @@
 package com.example.apk_administration.ui.theme.registros
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -35,6 +36,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -54,17 +56,15 @@ fun RegistroScreen(
     val groupedEntries = remember { mutableStateOf<Map<String, Map<Int, Int>>>(emptyMap()) }
     val groupedExits = remember { mutableStateOf<Map<String, Map<Int, Int>>>(emptyMap()) }
     val productMap by productViewModel.productIdToNameMap.collectAsState()
-
+    val filterType = remember { mutableStateOf("Todos") }
+    var showFilterSheet by remember { mutableStateOf(false) }
 
     // Llama a las funciones del ViewModel para obtener los datos agrupados
     LaunchedEffect(Unit) {
-        viewModel.getGroupedProductEntriesByDate { entries ->
-            groupedEntries.value = entries
-        }
-        viewModel.getGroupedProductExitsByDate { exits ->
-            groupedExits.value = exits
-        }
+        viewModel.getGroupedProductEntriesByDate { groupedEntries.value = it }
+        viewModel.getGroupedProductExitsByDate { groupedExits.value = it }
     }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -72,55 +72,53 @@ fun RegistroScreen(
             .verticalScroll(rememberScrollState())
     ) {
         // Filtro y botón para nuevo registro
-        FiltroYBotonNuevoRegistro()
-
-        // Lista de registros de productos
-        // Mostrar entradas agrupadas por fecha
-        Text(
-            text = "Entradas",
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(16.dp)
-        )
-        groupedEntries.value.forEach { (date, products) ->
-            Text(
-                text = "Fecha: $date",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(start = 16.dp, top = 8.dp)
-            )
-            products.forEach { (productId, quantity) ->
-                val productName = productMap[productId] ?: "Producto desconocido"
-                RegistroDeProductoCard(
-                    producto = productName, // Puedes reemplazarlo con un nombre real si tienes un mapa ID -> nombre
-                    cantidad = quantity,
-                    fecha = date,
-                    tipo = "Entrada"
-                )
+        FiltroYBotonNuevoRegistro(filterType) { selectedType ->
+            // Actualizar datos según el filtro seleccionado
+            when (selectedType) {
+                "Entradas" -> {
+                }
+                "Salidas" -> {
+                }
+                else -> {
+                }
             }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Mostrar salidas agrupadas por fecha
-        Text(
-            text = "Salidas",
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(16.dp)
-        )
-        groupedExits.value.forEach { (date, products) ->
-            Text(
-                text = "Fecha: $date",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(start = 16.dp, top = 8.dp)
+        if (showFilterSheet) {
+            FilterBottomSheet(
+                filterType = filterType,
+                onFilterApply = { showFilterSheet = false },
+                onDismissRequest = { showFilterSheet = false }
             )
-            products.forEach { (productId, quantity) ->
-                val productName = productMap[productId] ?: "Producto desconocido"
-                RegistroDeProductoCard(
-                    producto = productName, // Puedes reemplazarlo con un nombre real si tienes un mapa ID -> nombre
-                    cantidad = quantity,
-                    fecha = date,
-                    tipo = "Salida"
-                )
+        }
+
+        // Mostrar entradas agrupadas por fecha
+        when (filterType.value) {
+            "Entradas" -> {
+                Text("Entradas", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(16.dp))
+                groupedEntries.value.forEach { (date, products) ->
+                    MostrarProductosAgrupados(date, products, productMap, "Entrada")
+                }
             }
+            "Salidas" -> {
+                Text("Salidas", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(16.dp))
+                groupedExits.value.forEach { (date, products) ->
+                    MostrarProductosAgrupados(date, products, productMap, "Salida")
+                }
+            }
+            else -> {
+                Text("Entradas", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(16.dp))
+                groupedEntries.value.forEach { (date, products) ->
+                    MostrarProductosAgrupados(date, products, productMap, "Entrada")
+                }
+                Spacer(Modifier.height(16.dp))
+                Text("Salidas", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(16.dp))
+                groupedExits.value.forEach { (date, products) ->
+                    MostrarProductosAgrupados(date, products, productMap, "Salida")
+                }
+            }
+
+
+
         }
     }
 }
@@ -128,7 +126,12 @@ fun RegistroScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FiltroYBotonNuevoRegistro() {
+fun FiltroYBotonNuevoRegistro(
+    filterType: MutableState<String>,
+    onFilterApply: (String?) -> Unit
+) {
+    var showFilterSheet by remember { mutableStateOf(false) }
+
     Surface(
         tonalElevation = 2.dp,
         color = MaterialTheme.colorScheme.surface
@@ -145,7 +148,7 @@ fun FiltroYBotonNuevoRegistro() {
             },
             actions = {
                 IconButton(
-                    onClick = { /* Acción para filtrar productos */ },
+                    onClick = { showFilterSheet = true },
                     colors = IconButtonDefaults.iconButtonColors(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                         contentColor = MaterialTheme.colorScheme.onSurfaceVariant
@@ -157,6 +160,7 @@ fun FiltroYBotonNuevoRegistro() {
                         contentDescription = "Filtrar Productos"
                     )
                 }
+
             },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.surface,
@@ -164,6 +168,17 @@ fun FiltroYBotonNuevoRegistro() {
             ),
             modifier = Modifier.shadow(4.dp)
         )
+        // ModalBottomSheet para seleccionar filtros
+        if (showFilterSheet) {
+            FilterBottomSheet(
+                filterType = filterType,
+                onFilterApply = { selectedType ->
+                    onFilterApply(selectedType)  // Aplicar el filtro
+                    showFilterSheet = false
+                },
+                onDismissRequest = { showFilterSheet = false }
+            )
+        }
     }
 }
 
@@ -273,4 +288,21 @@ fun RegistroDeProductoCard(
     }
 }
 
-
+@Composable
+fun MostrarProductosAgrupados(
+    date: String,
+    products: Map<Int, Int>,
+    productMap: Map<Int, String>,
+    tipo: String
+) {
+    Text("Fecha: $date", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(start = 16.dp, top = 8.dp))
+    products.forEach { (productId, quantity) ->
+        val productName = productMap[productId] ?: "Producto desconocido"
+        RegistroDeProductoCard(
+            producto = productName,
+            cantidad = quantity,
+            fecha = date,
+            tipo = tipo
+        )
+    }
+}
