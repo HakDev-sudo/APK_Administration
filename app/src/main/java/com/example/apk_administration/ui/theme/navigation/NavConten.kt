@@ -22,6 +22,8 @@ import com.example.apk_administration.ui.theme.NFC.NFCManager
 import com.example.apk_administration.ui.theme.NFC.NFCReaderScreen
 import com.example.apk_administration.ui.theme.NFC.NFCWindow
 import com.example.apk_administration.ui.theme.NFC.NfcApiService
+import com.example.apk_administration.ui.theme.NFC.NfcScreenlist
+import com.example.apk_administration.ui.theme.NFC.NfcViewModel
 import com.example.apk_administration.ui.theme.NFC.ProductDetail
 import com.example.apk_administration.ui.theme.NFC.ProductNFCReader
 import com.example.apk_administration.ui.theme.NFC.ProductNFCReaderScreen
@@ -55,14 +57,15 @@ fun NavigationHost(
     productViewModel: ProductViewModel,
     productoApiService: ProductoApiService,
     stockMovementViewModel: StockMovementViewModel,
-    categoryViewModel: CategoryViewModel
+    categoryViewModel: CategoryViewModel,
+    nfcViewModel: NfcViewModel
 ) {
     NavHost(navController = navController, startDestination = "home") {
         // Pantalla de login
 
         // Pantalla de Home
         composable("home") {
-            HomeScreen(padding, navController, productoApiService, categoryApiService)
+            HomeScreen(padding, navController, productoApiService, categoryApiService, stockMovementViewModel)
 
         }
         composable("nfc") {
@@ -142,6 +145,7 @@ fun NavigationHost(
         composable("nfc_producto") {
             ProductNFCReader(activity, productViewModel, nfcApiService, stockMovementViewModel, navController)
         }
+        composable("nfc_list"){NfcScreenlist(nfcViewModel)}
         //stock
         composable(
             route = "receipt/{receiptDataJson}",

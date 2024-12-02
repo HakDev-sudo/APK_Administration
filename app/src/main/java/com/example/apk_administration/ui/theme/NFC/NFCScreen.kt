@@ -31,7 +31,7 @@ fun NFCTopBar(navController: NavHostController) {
     TopAppBar(
         title = { Text("Administrar NFC", fontSize = 20.sp, fontWeight = FontWeight.Bold) },
         actions = {
-            IconButton(onClick = {  }) {
+            IconButton(onClick = { navController.navigate("nfc_list") }) {
                 Icon(Icons.Default.List, contentDescription = "Listado  NFC")
             }
         }

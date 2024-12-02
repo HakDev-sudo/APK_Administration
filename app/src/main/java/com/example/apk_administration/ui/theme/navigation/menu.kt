@@ -42,6 +42,7 @@ import com.example.apk_administration.ui.theme.Category.CategoryApiService
 import com.example.apk_administration.ui.theme.Category.CategoryViewModel
 import com.example.apk_administration.ui.theme.NFC.NFCManager
 import com.example.apk_administration.ui.theme.NFC.NfcApiService
+import com.example.apk_administration.ui.theme.NFC.NfcViewModel
 import com.example.apk_administration.ui.theme.account.AuthNavHost
 import com.example.apk_administration.ui.theme.home.HomeScreen
 import com.example.apk_administration.ui.theme.products.ProductViewModel
@@ -75,6 +76,8 @@ fun AlmacenApp() {
     val stockMovementApiService = retrofit.create(StockMovementApiService::class.java)
     val stockMovementViewModel = StockMovementViewModel(stockMovementApiService, nfcApiService, productViewModel)
     val categoryViewModel = CategoryViewModel(categoryApiService,productoApiService)
+    val nfcViewModel = NfcViewModel(nfcApiService)
+
     // Llamar al CustomScaffold y pasar los servicios API como parámetros
     CustomScaffold(
         navController = navController,
@@ -83,7 +86,8 @@ fun AlmacenApp() {
         productViewModel = productViewModel,
         productoApiService = productoApiService,
         stockMovementViewModel = stockMovementViewModel,
-        categoryViewModel = categoryViewModel
+        categoryViewModel = categoryViewModel,
+        nfcViewModel = nfcViewModel
 
     )
 }
@@ -97,7 +101,8 @@ fun CustomScaffold(
     productViewModel: ProductViewModel,
     productoApiService: ProductoApiService,
     stockMovementViewModel: StockMovementViewModel,
-    categoryViewModel: CategoryViewModel
+    categoryViewModel: CategoryViewModel,
+    nfcViewModel: NfcViewModel
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -147,7 +152,8 @@ fun CustomScaffold(
                             productViewModel = productViewModel,
                             productoApiService = productoApiService,
                             stockMovementViewModel = stockMovementViewModel,
-                            categoryViewModel = categoryViewModel
+                            categoryViewModel = categoryViewModel,
+                            nfcViewModel = nfcViewModel
 
                         )
                     }

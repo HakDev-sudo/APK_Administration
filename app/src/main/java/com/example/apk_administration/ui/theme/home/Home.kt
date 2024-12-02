@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.filled.Output
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
@@ -47,6 +48,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.apk_administration.R
 import com.example.apk_administration.ui.theme.Category.CategoryApiService
 import com.example.apk_administration.ui.theme.products.ProductoApiService
+import com.example.apk_administration.ui.theme.stock.StockMovementViewModel
 
 
 // Acá escribiras tu
@@ -55,15 +57,23 @@ fun HomeScreen(
     padding: PaddingValues,
     navController: NavHostController,
     servicio: ProductoApiService,
-    categoriaServicio: CategoryApiService
+    categoriaServicio: CategoryApiService,
+    stockMovementViewModel: StockMovementViewModel
 ) {
     var totalStock by remember { mutableStateOf(0) }
     var isLoading by remember { mutableStateOf(true) }
+    var totalEntries by remember { mutableStateOf(0) }
+    var totalExits by remember { mutableStateOf(0) }
 
     LaunchedEffect(Unit) {
         val response = servicio.selectProductos()
         if (response.isNotEmpty()) {
             totalStock = response.sumOf { it.stock ?: 0 }
+        }
+        // Obtener totales de entradas y salidas
+        stockMovementViewModel.getTotalEntriesAndExits { totals ->
+            totalEntries = totals.values.sumOf { it.first } // Suma de todas las entradas
+            totalExits = totals.values.sumOf { it.second } // Suma de todas las salidas
         }
         isLoading = false
     }
@@ -135,10 +145,17 @@ fun HomeScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     StatusCard(
-                        title = "Pendiente de entrada",
-                        value = "300 items",
+                        title = "Total Entradas",
+                        value = "$totalEntries items",
                         icon = Icons.Filled.Input,
                         backgroundColor = MaterialTheme.colorScheme.secondaryContainer
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    StatusCard(
+                        title = "Total Salidas",
+                        value = "$totalExits items",
+                        icon = Icons.Filled.Output,
+                        backgroundColor = MaterialTheme.colorScheme.errorContainer
                     )
                 }
             }

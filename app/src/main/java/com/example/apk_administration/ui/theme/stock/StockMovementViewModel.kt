@@ -214,4 +214,35 @@ class StockMovementViewModel(
             }
         }
     }
+
+    fun getTotalEntriesAndExits(onSuccess: (Map<Int, Pair<Int, Int>>) -> Unit) {
+        viewModelScope.launch {
+            try {
+                // Obtener todos los movimientos de stock
+                val response = stockMovementApiService.selectStockMovements()
+
+                if (response.isNotEmpty()) {
+                    // Agrupar movimientos por producto
+                    val groupedByProduct = response.groupBy { it.product }
+
+                    // Calcular totales de entradas y salidas por producto
+                    val totalEntriesAndExits = groupedByProduct.mapValues { entry ->
+                        val entries = entry.value.filter { it.movementType == "entrada" }
+                            .sumOf { it.quantity } // Sumar las cantidades de entradas
+                        val exits = entry.value.filter { it.movementType == "salida" }
+                            .sumOf { it.quantity } // Sumar las cantidades de salidas
+                        Pair(entries, exits) // Retornar las cantidades de entradas y salidas
+                    }
+
+                    onSuccess(totalEntriesAndExits)
+                } else {
+                    println("No se encontraron movimientos de stock.")
+                    onSuccess(emptyMap())
+                }
+            } catch (e: Exception) {
+                println("Error al calcular totales: ${e.message}")
+            }
+        }
+    }
+
 }

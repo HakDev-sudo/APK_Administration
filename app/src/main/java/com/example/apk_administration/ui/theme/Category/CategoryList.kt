@@ -28,6 +28,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
@@ -69,6 +70,10 @@ fun CategoryListScreen(navController: NavHostController, servicio: CategoryApiSe
                     Icon(Icons.Default.Add, contentDescription = "Agregar Categoría")
                 }
             },
+            colors = TopAppBarDefaults.mediumTopAppBarColors(
+
+                titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            ),
         )
 
         // Lista de categorías
@@ -87,8 +92,11 @@ fun CategoryListScreen(navController: NavHostController, servicio: CategoryApiSe
                                 }
                             )
                         },
-                    shape = RoundedCornerShape(8.dp),
-                    colors = CardDefaults.cardColors(Color(0xFFD4CFF6)) // Diferente color para categorías
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
                 ) {
                     Row(
                         modifier = Modifier
@@ -102,7 +110,7 @@ fun CategoryListScreen(navController: NavHostController, servicio: CategoryApiSe
                             modifier = Modifier
                                 .size(60.dp) // Tamaño del círculo
                                 .clip(CircleShape) // Forma circular
-                                .background(Color.LightGray), // Color predeterminado si no hay imagen
+                                .background(MaterialTheme.colorScheme.primary), // Color predeterminado si no hay imagen
                             contentAlignment = Alignment.Center
                         ) {
                             if (categoria.img.isNullOrEmpty()) {
@@ -127,7 +135,11 @@ fun CategoryListScreen(navController: NavHostController, servicio: CategoryApiSe
                         }
                         // Mostrar la información de la categoría
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(text = categoria.name, style = MaterialTheme.typography.headlineMedium)
+                            Text(
+                                text = categoria.name,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
                         }
 
                         // Botones de Editar y Eliminar
@@ -151,3 +163,4 @@ fun CategoryListScreen(navController: NavHostController, servicio: CategoryApiSe
         }
     }
 }
+

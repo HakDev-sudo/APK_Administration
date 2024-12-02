@@ -15,7 +15,8 @@ import androidx.navigation.NavHostController
 fun ContenidoCategoryEliminar(navController: NavHostController, servicio: CategoryApiService, categoryId: Int) {
     var showDialog by remember { mutableStateOf(true) }
     var borrar by remember { mutableStateOf(false) }
-    var error by remember { mutableStateOf<String?>(null) } // Para manejar errores
+    var error by remember { mutableStateOf<String?>(null) }
+    var isDeleted by remember { mutableStateOf(false) } // Nuevo estado para evitar reintentos
 
     // Diálogo de confirmación
     if (showDialog) {
@@ -45,21 +46,25 @@ fun ContenidoCategoryEliminar(navController: NavHostController, servicio: Catego
     }
 
     // Eliminación de la categoría
-    if (borrar) {
+    if (borrar && !isDeleted) {
         LaunchedEffect(Unit) {
             try {
                 val response = servicio.deleteCategory(categoryId.toString())
                 if (response.isSuccessful) {
+                    isDeleted = true // Marcamos como eliminado para evitar reintentos
                     navController.navigate("categoryList") {
-                        popUpTo("categorias") { inclusive = true } // Regresar a la lista de categorías
+                        popUpTo("categorias") { inclusive = true }
                     }
                 } else {
                     error = "Error al eliminar la categoría"
+                    navController.navigate("categoryList") {
+                        popUpTo("categorias") { inclusive = true }
+                    }
                 }
             } catch (e: Exception) {
                 error = "Error: ${e.localizedMessage}"
             } finally {
-                borrar = false
+                borrar = false // Restablecer estado para evitar reintentos
             }
         }
     }
