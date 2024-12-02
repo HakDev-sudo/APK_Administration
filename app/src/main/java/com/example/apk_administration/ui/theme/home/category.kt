@@ -25,8 +25,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.NavHostController
 import com.example.apk_administration.R
 import coil.compose.AsyncImage
@@ -39,11 +41,9 @@ fun CategoryCarousel(
     navController: NavHostController,
     servicio: CategoryApiService
 ) {
-    // Estado para las categorías
     var categories by remember { mutableStateOf<List<CategoryModel>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
 
-    // Llamada a la API para obtener las categorías
     LaunchedEffect(Unit) {
         try {
             categories = servicio.selectCategories()
@@ -54,24 +54,53 @@ fun CategoryCarousel(
         }
     }
 
-    Column {
-        Text(
-            text = "Categorías",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+    ) {
+        Row(
             modifier = Modifier
-                .padding(16.dp)
-                .clickable {
-                    navController.navigate("categoryList") // Navegar a la lista completa
-                }
-        )
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Categorías",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            IconButton(
+                onClick = { navController.navigate("categoryList") }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowForward,
+                    contentDescription = "Ver todas las categorías",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+
         if (isLoading) {
-            // Indicador de carga mientras se obtienen las categorías
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(48.dp)
+                )
+            }
         } else {
-            LazyRow {
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 items(categories) { category ->
-                    CategoryItem(category = category,navController = navController)
+                    CategoryItem(category = category, navController = navController)
                 }
             }
         }
@@ -80,22 +109,30 @@ fun CategoryCarousel(
 
 @Composable
 fun CategoryItem(category: CategoryModel, navController: NavHostController) {
-    Card(
+    ElevatedCard(
         modifier = Modifier
             .size(180.dp)
-            .padding(8.dp)
             .pointerInput(Unit) {
                 detectTapGestures(
                     onLongPress = {
-                        // Navegar a la pantalla de detalles de la categoría
                         navController.navigate("categoryDetails/${category.id}")
                     }
                 )
             },
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.elevatedCardElevation(
+            defaultElevation = 4.dp,
+            pressedElevation = 8.dp
+        ),
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        shape = MaterialTheme.shapes.medium
     ) {
-        Box {
-            // Carga de la imagen desde la URL usando Coil
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(MaterialTheme.shapes.medium)
+        ) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(category.img)
@@ -105,16 +142,24 @@ fun CategoryItem(category: CategoryModel, navController: NavHostController) {
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
+
             Surface(
-                color = Color.Black.copy(alpha = 0.6f),
-                modifier = Modifier.align(Alignment.BottomStart)
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth(),
+                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+                tonalElevation = 3.dp
             ) {
                 Text(
                     text = category.name,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(8.dp)
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .fillMaxWidth(),
+                    textAlign = TextAlign.Center
                 )
             }
         }
